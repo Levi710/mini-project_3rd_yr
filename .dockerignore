@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+.env
+.git/
+.gitignore
+.pytest_cache/
+debug.txt
+output_log.txt
+verify_dump.txt
+mp1/debug.txt
+mp1/output_log.txt
+mp1/verify_dump.txt
