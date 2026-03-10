@@ -1,0 +1,513 @@
+{
+ "sensors-25-01786": {
+  "doc_id": "sensors-25-01786",
+  "filename": "sensors-25-01786.pdf",
+  "chunks": [
+   "# sensors-25-01786",
+   "## Page 1",
+   "Academic Editor: Boyang Li\nReceived: 9 February 2025\nRevised: 2 March 2025\nAccepted: 12 March 2025\nPublished: 13 March 2025\nCitation: Zhang, Z.; Li, G. UAV\nImagery Real-Time Semantic\nSegmentation with Global–Local\nInformation Attention. Sensors 2025 ,\n25, 1786. https://doi.org/10.3390/\ns25061786\nCopyright: © 2025 by the authors.\nLicensee MDPI, Basel, Switzerland.\nThis article is an open access article\ndistributed under the terms and\nconditions of the Creative Commons\nAttribution (CC BY) license\n(https://creativecommons.org/\nlicenses/by/4.0/).\nArticle\nUA V Imagery Real-Time Semantic Segmentation with\nGlobal–Local Information Attention\nZikang Zhang and Gongquan Li *\nSchool of Geosciences, Yangtze University, Wuhan 430100, China; 2022710475@yangtzeu.edu.cn\n*Correspondence: chuck123@yangtzeu.edu.cn\nAbstract: In real-time semantic segmentation for drone imagery, current lightweight al-\ngorithms suffer from the lack of integration of global and local information in the image,\nleading to missed detections and misclassifications in the classification categories. This\npaper proposes a method for the real-time semantic segmentation of drones that integrates\nmulti-scale global context information. The principle utilizes a UNet structure, with the\nencoder employing a Resnet18 network to extract features. The decoder incorporates a\nglobal–local attention module, where the global branch compresses and extracts global\ninformation in both vertical and horizontal directions, and the local branch extracts local\ninformation through convolution, thereby enhancing the fusion of global and local infor-\nmation in the image. In the segmentation head, a shallow-feature fusion module is used\nto multi-scale integrate the various features extracted by the encoder, thereby strengthen-\ning the spatial information in the shallow features. The model was tested on the UAvid\nand UDD6 datasets, achieving accuracies of 68% mIoU (mean Intersection over Union)\nand 67% mIoU on the two datasets, respectively, 10% and 21.2% higher than the baseline\nmodel UNet. The real-time performance of the model reached 72.4 frames/s, which is\n54.4 frames/s higher than the baseline model UNet. The experimental results demonstrate\nthat the proposed model balances accuracy and real-time performance well.\nKeywords: real-time semantic segmentation; drone imagery; feature fusion; global context\ninformation\n1. Introduction\nWith the continuous advancement of drone technology, low-altitude drones can collect\nreal-time images at any time and even capture data from different angles. As shown in\nFigure 1, urban images collected by UAVs have high resolution and contain rich spatial\ninformation, which has great potential in disaster assessment [ 1,2], emergency response [ 3],\ntraffic analysis [4,5], environmental monitoring [6,7], and other applications.\nSemantic segmentation is a novel and challenging task in various image processing\ntasks for drone remote sensing. Semantic segmentation aims to classify every pixel in an\nimage based on its semantic information. In recent years, the introduction and continuous\nimprovement of convolutional neural networks (CNNs) have achieved remarkable results\nin semantic segmentation tasks [8,9].\nCurrent drone image analysis systems rely on images captured by drones and then\nuploaded to a computer platform for analysis. However, in the face of urban scene problems,\nsuch as urban land-use analysis and traffic management, it is necessary to segment the\ncategories of ground objects in the urban scene in real-time for analysis. Therefore, a\nlightweight semantic segmentation model is needed to segment UAV images in application.\nSensors 2025 ,25, 1786 https://doi.org/10.3390/s25061786",
+   "## Page 2\n\nSensors 2025 ,25, 1786 2 of 19\nAt present, many semantic segmentation methods try to increase the network depth and\nthe number of channels of the model to capture richer semantic and spatial information\nso as to obtain better segmentation results. However, increasing the depth and number\nof channels also increases the number of parameters in the network, thus requiring more\ncomputing power from the hardware, in a way that undoubtedly increases the inference\ntime of the model.\nSensors 2025 , 25, x FOR PEER REVIEW 2 of 19",
+   "Figure 1. Two drone images and their semantic annotati ons from the UAvid an d the UDD6 dataset,\nrespectively. ( a) Oblique projection, ( b) Orthophoto projection.\nSemantic segmentation is a novel and challenging task in various image processing\ntasks for drone remote sensing. Semantic segmen tation aims to classify every pixel in an\nimage based on its semantic information. In recent years, the introduction and continuous improvement of convolutional neural networks  (CNNs) have achieved remarkable results\nin semantic segmentation tasks [8,9].\nCurrent drone image analysis systems rely on images captured by drones and then\nuploaded to a computer platform for analysis. However, in the face of urban scene prob-\nlems, such as urban land-use analysis and tra ﬃc management, it is necessary to segment\nthe categories of ground objects in the urban scene in real-time for analysis. Therefore, a lightweight semantic segmentation model is needed to segment UAV images in\nFigure 1. Two drone images and their semantic annotations from the UAvid and the UDD6 dataset,\nrespectively. ( a) Oblique projection, ( b) Orthophoto projection.\nPre-trained models are usually trained on massive amounts of data, which improves\nthe efficiency and stability of training. However, for real-time semantic segmentation\ntasks, adopting a large pre-trained model not only improves accuracy but also brings\nhigh computational complexity. Therefore, this paper uses a lightweight pre-trained\nResNet18 model as the encoder in the UNet model for feature extraction, which solves the\nlimitations of unmanned aerial vehicle devices. This article designs a lightweight global–\nlocal attention block for decoders that require lightweight operations. This block consists\nof a global attention branch and a convolutional local branch, used to capture global and",
+   "## Page 3",
+   "Sensors 2025 ,25, 1786 3 of 19\nlocal contextual information about features. Finally, multi-scale methods are applied at the\nend of the decoder to fuse the features extracted by the encoder at different stages in order\nto enrich the spatial information of shallow features. Then, the fused features are added to\nthe features of the global–local attention block, and the segmentation results are obtained\nthrough 1 ×1 convolution and upsampling.\n2. Related Works\n2.1. Network Architecture\nIn recent years, with the rapid advancement of deep learning technology, deep learning\nnetworks for real-time semantic segmentation tasks have mainly been categorized into\nsingle-branch, dual-branch, and U-shaped networks.\nSingle-branch networks focus primarily on the encoder, simplifying the decoder lay-\ners. The decoder is often designed to be very lightweight, reducing the parameters and\ncomputational load of the decoder and other branches, thus improving the computational\nspeed of the model. Liu et al. [ 10] proposed a feature pyramid encoding block that en-\ncodes multi-scale contextual features using deep dilated convolutions at all encoder stages.\nOn the NVIDIA TiTanV , they tested the Cityscapes and CamVid datasets at a resolution\nof1024×512, achieving a real-time performance of 102 frames per second (fps) with\naccuracies of 68% mIoU and 65.4% mIoU, respectively.\nCompared to single-branch networks, dual-branch networks use one branch to extract\nspatial information and another to model semantic contextual information. This structure\nbalances segmentation accuracy and inference speed. Yu et al. first proposed the bilateral\nsegmentation network, BiSeNet [ 11]. The spatial path branch extracts shallow spatial\ninformation to generate high-resolution features, while the context path extracts deep,\nrich semantic information. A feature fusion module is used to merge the two types of\nfeatures. On TitanXP , testing the Cityscapes dataset at a resolution of 2048 ×1024 achieved\na real-time performance of 65.5 fps with an accuracy of 74.7% more. Fan et al. proposed\na short-term dense cascade network (SDCN), which adjusts the depth and number of\nconvolution kernels to capture receptive fields of different features [ 12]. The spatial path\nbranch uses only the features from stage 3, and DetailHead is employed only during\ntraining to extract more spatial detail. Testing on 1080 Ti with the Cityscapes dataset at\n512×1024 resolution achieved 250.4 fps with an accuracy of 71.9% more.\nU-shaped networks adopt an encoder–decoder structure, allowing them to sample\nand fuse features across different scales, extracting rich spatial and contextual information.\nZhang et al. introduced a scale-aware semantic extractor that extracts semantic information\nat different scales, capturing the entire image’s receptive fields and semantic informa-\ntion [ 13]. Testing on Snapdragon 865 with the ADE20K dataset at 512 ×512 resolution\nachieved 13 fps with an accuracy of 36.1% more. Wang et al. improved model precision\nand accuracy by using a lightweight pre-trained model, ResNet18, as the encoder and pro-\nposed a global–local transformer block in the decoder to capture global and local context at\nmultiple scales [ 14]. They also introduced a feature refinement head to fuse features from\nthe encoder and decoder, enhancing both semantic and spatial information. Testing on the\nUAVid and LoveDA datasets with a 3090 GPU at 1024 ×1024 resolution achieved 115.6 fps\nwith accuracies of 67.8% mIoU and 52.4% mIoU, respectively.\nCompared to single-branch and dual-branch networks, U-shaped networks extract\nfeatures at the encoder side and apply skip connections to pass these features to the\ncorresponding decoder layers. The features from each decoder layer are fused with the\nup-sampled features from the encoder, serving as input for the next up-sampling layer.\nThis fusion of multi-scale features from the encoder improves segmentation accuracy.\nHowever, U-shaped network decoders often need to perform global context feature extrac-",
+   "## Page 4",
+   "Sensors 2025 ,25, 1786 4 of 19\ntion, and the complex fusion operations add extra computational burdens to the decoder.\nTherefore, the decoder needs lightweight fusion operations and efficient global context\nextraction mechanisms.\n2.2. Global Contextual Information Module\nSince CNN convolutions can only utilize local information to understand images,\nmany recent works have attempted to construct global context modules to capture global\ncontextual information. A popular approach is to integrate attention mechanisms into the\nnetwork modules.\nHu et al. first proposed the channel attention mechanism in SENet, where spatial\ninformation is compressed into a global vector through pooling operations [ 15]. This global\nvector is then transformed non-linearly, and weights are generated using the Sigmoid\nfunction to multiply with the input. This process captures the inter-channel information in\nthe feature map, enhancing valuable features in the channels while suppressing less useful\nones. Later, Woo et al. combined channel attention with spatial attention mechanisms in\nsequence, capturing both spatial positional information and inter-channel information [ 16].\nMisra et al. established interactions between different dimensions by rotating feature maps\nand applying pooling operations [17].\nAlthough the above models combine channel and spatial attention mechanisms, per-\nforming 2D global pooling leads to the loss of positional information, which is crucial\nfor generating spatial attention maps. This paper proposes a UNet-based model where\nthe ResNet18 is used as the encoder to extract features, and a coordinate attention mecha-\nnism [ 18] is introduced into the decoder. A dual-branch module is designed to extract global\nand local contextual information, with the global branch capturing global information and\nthe local branch focusing on local information.\n3. Principles and Methods\n3.1. Network Principles\nThis model is constructed based on the UNet structure, with the ResNet18 model\nused as the encoder and the global local attention module used as the decoder, as shown\nin Figure 2. The encoder of this model consists of four ResNet blocks, where the feature\nmaps are down-sampled at each stage with a scaling factor of 2. The decoder comprises\nthree global–local attention mechanisms and a shallow-feature fusion module: skip the\nconnection and use the most straightforward connection operation. The global–local\nattention mechanism integrates corresponding feature information from the encoder to\nextract semantic information about the features. In contrast, the shallow-feature fusion\nmodule combines features from different scales of the encoder to enhance the spatial\ninformation of shallow features.",
+   "## Page 5\n\nSensors 2025 ,25, 1786 5 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 5 of 19\n\n module combines features from di ﬀerent scales of the encoder to enhance the spatial in-\nformation of shallow features.",
+   "Figure 2. Overall structure diagram of the proposed model. (*: Upsampling).\n3.2. Global–Local A ttention Module\nIn the global–local a ttention module, both a global branch and a local branch were\ndesigned to improve the model’s ability to ex tract and fuse contextual information from\nfeature maps. In the global branch, p ooling operations are applied along the x-axis and y-\naxis, compressing the information in these di rections and embedding it into the feature\nmap. However, compressing only along the x-axis and y-axis overlooks the relationships\nbetween neighboring pixels. Therefore, an addi tional local branch is designed, utilizing\nconvolution operations with kernel sizes of 1 × 1 and 3 × 3 to capture the relevant infor-mation between neighboring pixels. The ne twork structure is shown in Figure 3.\nFigure 2. Overall structure diagram of the proposed model. (*: Upsampling).\n3.2. Global–Local Attention Module\nIn the global–local attention module, both a global branch and a local branch were\ndesigned to improve the model’s ability to extract and fuse contextual information from\nfeature maps. In the global branch, pooling operations are applied along the x-axis and y-\naxis, compressing the information in these directions and embedding it into the feature map.\nHowever, compressing only along the x-axis and y-axis overlooks the relationships between\nneighboring pixels. Therefore, an additional local branch is designed, utilizing convolution\noperations with kernel sizes of 1 ×1 and 3 ×3 to capture the relevant information between\nneighboring pixels. The network structure is shown in Figure 3.\nThis module consists of a global attention branch and a local branch. The global\nattention branch utilizes coordinate attention to extract global information, considering\nboth inter-channel relationships and positional information. The local branch applies two\nconvolutions with kernel sizes of 3 and 1 to capture local information from the feature map.\nThe global and local branches are then fused, enabling interaction between global and local\ninformation, which enhances the algorithm’s accuracy.",
+   "## Page 6\n\nSensors 2025 ,25, 1786 6 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 6 of 19\n\n\nFigure 3. Global–local a ttention module network structure (GLAM).\nThis module consists of a global a ttention branch and a local branch. The global at-\ntention branch utilizes coordinate a ttention to extract global information, considering both\ninter-channel relationships and positional information. The local branch applies two con-\nvolutions with kernel sizes of 3 and 1 to capture local information from the feature map. The global and local branches are then fuse d, enabling interaction between global and\nlocal information, which enhances the algorithm’s accuracy.\nFirstly, this article inputs the feature maps of four ResNet blocks into the correspond-\ning global–local a ttention modules through skip connections. The output of the deep\nFigure 3. Global–local attention module network structure (GLAM).\nFirstly, this article inputs the feature maps of four ResNet blocks into the corresponding\nglobal–local attention modules through skip connections. The output of the deep global–\nlocal attention modules will be fused with the skip-connected feature maps as the feature\ninput of the upper-level attention modules.\nIn the global branch, average pooling is performed along the horizontal and vertical\ndirections, resulting in two 1D vectors (H ×1 and 1 ×W).\nXavg=XAvgPool (Input ) (1)",
+   "## Page 7",
+   "Sensors 2025 ,25, 1786 7 of 19\nYavg=YAvgPool (Input ) (2)\nThese vectors are concatenated in the spatial dimension, followed by a 1 ×1 convolu-\ntion to reduce the channel dimensions.\nXYavg=Conv 2d\u0000\nConcat\u0000\nXavg,Yavg\u0001\u0001\n(3)\nThen batch normalization (BN) and a non-linear activation are applied to encode the\nspatial information in the vertical and horizontal directions. The result is then split back\ninto horizontal and vertical components, and a 1 ×1 convolution is used to restore the\nchannel count.\nFx,Fy=Split\u0000\nRelu\u0000\nBatchNorm\u0000\nXYavg\u0001\u0001\u0001\n(4)\nWx,Wy=δ(Conv 1×1(Fx)),δ\u0000\nConv 1×1\u0000\nFy\u0001\u0001\n(5)\nFinally, a gating mechanism generates the weights, and the global contextual features\nare obtained through weighted summation.\nY=X⊙Wx⊙Wy (6)\nIn the formula, Conv 1×1 represents a convolution operation with a kernel size of\n1×1;XavgandYavgrepresent the coordinate information embedding in the horizontal and\nvertical directions, respectively; δrepresents the Sigmoid function; Wx,Wyrepresent the\nweights in the horizontal and vertical directions; ⊙represents element-wise multiplication.\nFor the local branch, The Input ∈Rˆ(C×H×W) is passed through convolution\noperations with kernel sizes of 3 ×3 and 1 ×1, followed by a BN (Batch Normalization)\nlayer. The output of the local branch Zis obtained by element-wise addition of the processed\nfeatures. This process can be described as follows:\nA=BatchNorm (Conv 3×3(Input )) (7)\nB=BatchNorm (Conv 1×1(Input )) (8)\nZ=A⊕B (9)\nIn the formula, ⊕represents the element-wise addition operation. We add the features\nfrom the global and local branches. Then, we apply a depth-wise separable convolution\nwith a kernel size of 3 ×3, followed by a BN (Batch Normalization) layer to obtain the final\nfused features. This process can be described as follows:\nOutput =BN(DWConv 3×3(Y⊕Z)) (10)\nIn the formula, DWConv 3×3 represents a depth-wise separable convolution with a\nkernel size of 3 ×3.\n3.3. Shallow Layer Feature Fusion Module\nWe introduce a shallow-feature fusion module to enhance the spatial details of shallow\nlayer features and improve classification accuracy, as shown in Figure 4. First, the features\nfrom the other three ResNet blocks undergo up-sampling and convolution operations\nto align their size and dimensionality with those of the features from the first ResNet\nblock. Subsequently, global feature representation is obtained through a global average\npooling operation in the spatial dimension. A 1 ×1 convolution is then applied to model\nthe inter-channel relationships, and a Sigmoid activation function is used to generate\nchannel weights.",
+   "## Page 8\n\nSensors 2025 ,25, 1786 8 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 8 of 19\n\n operations to align their size and dimensionality with those of the features from the ﬁrst\nResNet block. Subseque ntly, global feature representation is obtained through a global\naverage pooling operation in the spatial dimens ion. A 1 × 1 convolution is then applied to\nmodel the inter-channel relationships, and a Si gmoid activation function is used to gener-\nate channel weights.",
+   "Figure 4. Shallow layer feature fusion module network structure (SLFM).\nNext, the global features from the four sc ales are concatenated along the second di-\nmension to obtain the corresponding output X.  The weights for each scale are then derived\nusing the softmax function along the second dimension. Finally, the generated weights\nare multiplied element-wise with the co rresponding inputs and summed together.\n4. Experimental Process and Analysis\nIn this paper, the model is trained on two datasets of UAV remote sensing imagery,\nUAVid [19], UDD6 [20],  and LoveDA [21]. The model’s accuracy and inference speed are\ntested and compared with several state-of-t he-art models proposed in recent years.\n4.1. Dataset\nThe UAVid dataset is a high-resolution dataset (3840 × 2160 and 4096 × 2160) cap-\ntured by drones, designed explicitly for urba n scene semantic segmentation tasks. It con-\ntains 42 sequences. Each sequence includes ten images, resulting in a total of 420 images.\nThe dataset is divided into 20 training sequen ces, 7 validation sequences, and 15 test se-\nquences; that is, the training set has 270 images, and the validation set has 150 images, which are independent of each other. The UA Vid dataset includes eight types of ground\nFigure 4. Shallow layer feature fusion module network structure (SLFM).\nNext, the global features from the four scales are concatenated along the second\ndimension to obtain the corresponding output X. The weights for each scale are then\nderived using the softmax function along the second dimension. Finally, the generated\nweights are multiplied element-wise with the corresponding inputs and summed together.\n4. Experimental Process and Analysis\nIn this paper, the model is trained on two datasets of UAV remote sensing imagery,\nUAVid [ 19], UDD6 [ 20], and LoveDA [ 21]. The model’s accuracy and inference speed are\ntested and compared with several state-of-the-art models proposed in recent years.\n4.1. Dataset\nThe UAVid dataset is a high-resolution dataset (3840 ×2160 and 4096 ×2160) captured\nby drones, designed explicitly for urban scene semantic segmentation tasks. It contains\n42 sequences. Each sequence includes ten images, resulting in a total of 420 images.\nThe dataset is divided into 20 training sequences, 7 validation sequences, and 15 test\nsequences; that is, the training set has 270 images, and the validation set has 150 images,\nwhich are independent of each other. The UAVid dataset includes eight types of ground\nobjects: buildings, roads, static vehicles, trees, low vegetation, people, moving vehicles,\nand cluttered backgrounds.\nUDD6 is a dataset for the understanding and reconstruction of aerial scenes collected\nand labeled by the Graphics and Interaction Laboratory of Peking University using DJI\nPhantom 4 drones at a height between 60–100 m in four cities in China. The resolution of\nthe data is 4 k (4096 ×2160) or 12 M (4000 ×3000) and includes a variety of urban scenes.",
+   "## Page 9",
+   "Sensors 2025 ,25, 1786 9 of 19\nThe dataset is divided into 85 training images, 35 verification images and 20 test images,\nand the training images and test images are independent of each other. This dataset is\ndivided into facades, roads, vegetation, cars, roofs, and others.\nThe LoveDa dataset constructs an urban–rural domain adaptive land-cover dataset,\nwhich includes 5987 high-resolution images of 0.3 m from three different cities, Nanjing,\nChangzhou, and Wuhan. Each image has a resolution of 1024 ×1024 and includes seven\ncategories: background, buildings, roads, water bodies, bare soil, forest land, and cultivated\nland. According to the official LoveDA data, the training set consists of 2521 images, the\nvalidation set consists of 1670 images, and the test set consists of 1796 images.\n4.2. Experimental Conditions\nThe experiments were conducted using the PyTorch 2.1.0 deep learning framework and\nthe CUDA 11.8 library, with Python version 3.8, on a Windows 11 operating system. Model\ntraining and testing were performed on an Intel Xeon Gold 6348 CPU (Inter, Shanghai,\nChina) and an NVIDIA GeForce RTX 3090 24 GB GPU (Nvidia, Shanghai, China) with\n256 GB of RAM.\n4.3. Performance Evaluation Metrics\nIn this paper, the evaluation metrics include the mean Intersection over Union (mIoU)\nto measure the prediction accuracy of the algorithm, and the frames per second (FPS) to\nassess the computational speed of the proposed model on the experimental hardware. The\nmIoU is calculated as the average ratio of the intersection and union between the ground\ntruth and the predicted values for all classes. The formula for mIoU is as follows:\nmIoU =1\nm+1m\n∑\ni=0pii\n∑m\nj=0pij+∑m\nj=0pji−pii(11)\nIn the formula, mrepresents the number of pixel classes; pijis the number of pixels\nwhose true class is ibut are predicted as class j;piiis the number of pixels correctly\npredicted as a class, i, where the actual class is also i.\nFPS is calculated as the ratio of the number of frames Nto the time required to process\nthem, representing the model’s computational speed:\nfFPS=N\n∑N\ni=1Tfaçade(12)\nIn the formula, Nrepresents the number of frames, and Tiis the time required to\nprocess the i-th image.\nF1 is a statistical indicator used to measure the accuracy of binary classification models.\nIt is the harmonic mean of precision and recall, providing a single metric to evaluate the\noverall performance of the model. The range of F1 values is from 0 to 1, with higher values\nindicating better performance of the model.\nF1=2∗TP\nTP+FP+TP+FN(13)\nAmong them, TPcorrectly predicted the positive class; that is, it was originally a\npositive class and recognized the positive class as well; TNcorrectly predicted the negative\nclass; that is, it was originally a negative class and recognized a negative class as well; FP\nis incorrectly predicted as a positive class, meaning it was originally a negative class but\nrecognized as a positive class; FNwas incorrectly predicted as a negative class, meaning it\nwas originally a positive class but was recognized as a negative class.",
+   "## Page 10",
+   "Sensors 2025 ,25, 1786 10 of 19\n4.4. Comparative Analysis of Experimental Results\nTo validate the impact of each module in this paper on mIoU and FPS, we conducted\nevaluations on the UDD6 dataset and the UAVid dataset. The evaluation metrics, mIoU\nand FPS, were used to analyze the impact of the modules on the model’s segmentation\naccuracy and inference speed.\nDuring training, the AdamW optimizer was used to train the models, with the base\nlearning rate set to 0.0006. A cosine annealing strategy was applied to adjust the learning\nrate. The batch size was set to 8, and the number of epochs to 40. The cross-entropy\nloss function was used as the loss function during training. In the experiments, images\nfrom both datasets were padded and cropped into eight patches of 1024 ×1024 pixels.\nData augmentation techniques, such as random vertical and horizontal flips and random\nbrightness adjustments, were applied to the input images.\n4.4.1. UDD6 Ablation Study\nIn this paper, different combinations of modules were functionally verified on the\nUDD6 dataset, with the results shown in Table 1. The baseline model used was Unet.\nTable 1. Effect of modules on the UDD6 dataset.\nModelPer-Class IoU (%)mIoU\n(%)F1\n(%)OA\n(%) Façade Road Vegetation Vehicle Roof Other\nBaseline 44.1 51.8 30.2 65.6 37.3 75.0 45.8 61.9 71.2\nBaseline + GLAM 62.1 65.4 60.7 77.3 65.2 88.7 65.8 79.5 84.4\nBaseline + GLAM + SLFM 62.1 69.9 62.0 77.4 66.0 89.9 67.2 80.2 84.8\nIn Table 1, the mIoU, F1, and OA metrics were used to test the effect of the modules\non network performance. It can be observed that the added modules contributed to\na particular improvement in mIoU compared to the baseline model. After integrating\nall proposed modules, the mIoU of this model reached 67%, an improvement of 21.2%\ncompared to the baseline model. Adding the GLAM module to the baseline model has\nsignificantly improved the recognition of various types, especially in the Façade class, Road\nclass, Vegetation class, and Roof class, where the improvement is better, with an increase\nof 18%, 13.6%, 30.5%, and 27.9%, respectively. When both the GLAM and SLFM modules\nare added to the baseline model, compared to a single GLAM module, the segmentation\nperformance is better in the Road class, Vegetable class, and Other class, with improvements\nof 4.5%, 1.3%, and 1.2%, respectively. For other categories, the effect remained the same or\nslightly improved, with a 1.4% increase in mIoU, a 0.7% increase in the F1 score, and a 0.4%\nincrease in OA.\nFigure 5 presents the results of ablation experiments on the UDD6 dataset, comparing\ndifferent scenarios. The highlighted sections indicate the differences between various\nmodules. Adding the modules enhances the model’s ability to segment details and small\nobjects more accurately. For example, when comparing the segmentation results from the\nfirst and second rows, adding the modules improves the accuracy and enables precise\nsegmentation of object edges. The experimental results demonstrate the effectiveness of the\nproposed modules.",
+   "## Page 11\n\nSensors 2025 ,25, 1786 11 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 11 of 19",
+   "Figure 5. UDD ablation study. (The im age name is: DJI_0538.JPG).\n4.4.2. UAVid Ablation Study\nIn this paper, the functionality of di ﬀerent module combinations was veri ﬁed on the\nUAVid dataset, with results shown in Tabl e 1, where the baseline refers to Unet.\nThe results in Table 2 show that the modules remain e ﬀective on the UAVid dataset.\nThe addition of these modules to the baseline  brought about an increase in the segmenta-\ntion accuracy, measured by mIoU (mean Intersection over Union). Speci ﬁcally, adding\nindividual and combined modu les resulted in 9% and 10% improvements in mIoU, re-\nspectively, compared to the baseline.\nTable 2. Eﬀect of the modules on the UAVid dataset. (Online Test).\nModel Per-Class IoU (%) mIoU% Clutter Building Road Tree Vegetation Moving Car Static Car Human\nBaseline 57 79 74 75 57 66 38 25 58\nBaseline + GLAM 68 86 80 80 63 74 57 31 67\nBaseline + GLAM +\nSLFM 68 87 81 80 63 74 59 31 68\nFigure 6 showcases the results of ablation  experiments on the UAVid dataset for the\nproposed model. The results show that the proposed model enhances the detection of\nsmall objects and details. Adding the GLAM module to the baseline model has improved\nthe precise segmentation of object edge detai ls. Building on this, incorporating the SLFM\nmodule has enhanced the segmentation of smal l targets, such as vegetation recognition,\nmaking it closer to accurate labels. These results demonstrate the generalization capability of the proposed modules, e ﬀectively improving the model’s segmentation accuracy while\nachieving a balanced trade-o ﬀ between precision and speed.\nFigure 5. UDD ablation study. (The image name is: DJI_0538.JPG).\n4.4.2. UAVid Ablation Study\nIn this paper, the functionality of different module combinations was verified on the\nUAVid dataset, with results shown in Table 1, where the baseline refers to Unet.\nThe results in Table 2 show that the modules remain effective on the UAVid dataset.\nThe addition of these modules to the baseline brought about an increase in the segmentation\naccuracy, measured by mIoU (mean Intersection over Union). Specifically, adding individ-\nual and combined modules resulted in 9% and 10% improvements in mIoU, respectively,\ncompared to the baseline.\nTable 2. Effect of the modules on the UAVid dataset. (Online Test).\nModelPer-Class IoU (%)\nmIoU%Clutter Building Road Tree Vegetation Moving Car Static Car Human\nBaseline 57 79 74 75 57 66 38 25 58\nBaseline + GLAM 68 86 80 80 63 74 57 31 67\nBaseline + GLAM +\nSLFM68 87 81 80 63 74 59 31 68\nFigure 6 showcases the results of ablation experiments on the UAVid dataset for the\nproposed model. The results show that the proposed model enhances the detection of\nsmall objects and details. Adding the GLAM module to the baseline model has improved\nthe precise segmentation of object edge details. Building on this, incorporating the SLFM\nmodule has enhanced the segmentation of small targets, such as vegetation recognition,\nmaking it closer to accurate labels. These results demonstrate the generalization capability\nof the proposed modules, effectively improving the model’s segmentation accuracy while\nachieving a balanced trade-off between precision and speed.",
+   "## Page 12\n\nSensors 2025 ,25, 1786 12 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 12 of 19",
+   "Figure 6. UAVid ablation study. (The image name is: Seg5\\000400.png).\n4.4.3. UAVid Comparison Experiment\nTo verify the proposed algorithm, we co nducted a comparative study on the UAVid\ndataset with various network models, such as  CGNet [22], ContextNet [23], DABNet [24],\nEDANet [25], FPENet [10], LinkNet [26], SegN et [8], LCNet [27], and UnetFormer [14].\nThe comparison results are shown in Table 3.  The proposed algorithm achieved the high-\nest mIoU of 68%. The proposed model outperformed CGNet, ContextNet, DABNet,\nEDANet, FPENet, LinkNet, and SegNet in UA Vid class recognition,  and achieved compa-\nrable performance with UnetFormer. Speci ﬁcally, our model outperforms UnetFormer by\n3% in static vehicle recognition.\nTable 3. The eﬀectiveness of di ﬀerent algorithms on the UAVid dataset (Resolution: 1024 × 1024) .\nModel Clutter Building Road Tree Vegetation Moving Car Static Car Human\nCGNet 53 75 74 71 54 62 32 20\nContextNet 54 76 73 72 53 61 31 18\nDABNet 57 79 76 75 58 67 38 25\nEDANet 57 79 76 74 56 65 38 24\nFPENet 47 69 67 65 46 44 17 0\nLinkNet 54 78 73 74 55 66 36 13\nSegNet 50 74 71 68 47 60 23 18\nUnetFormer 68 87 81 80 63 74 56 31\nLCNet 55 76 76 73 55 62 30 10\nOurs 68 87 81 80 63 74 59 31\nThis article compares the prediction results of di ﬀerent models on the Uavid dataset\nin Figure 7, with some apparent di ﬀerences marked with white wireframes. From the ﬁg-\nure, it can be observed that the proposed mo del demonstrates superior segmentation ac-\ncuracy for edge details compared to other model s. For instance, in the areas of the house\nand the grass beside the road highlighted in the white box, the proposed model achieves\nmore precise recognition of the house edges and the grass along the road than the other models.\nFigure 6. UAVid ablation study. (The image name is: Seg5 \\000400.png).\n4.4.3. UAVid Comparison Experiment\nTo verify the proposed algorithm, we conducted a comparative study on the UAVid\ndataset with various network models, such as CGNet [ 22], ContextNet [ 23], DABNet [ 24],\nEDANet [ 25], FPENet [ 10], LinkNet [ 26], SegNet [ 8], LCNet [ 27], and UnetFormer [ 14]. The\ncomparison results are shown in Table 3. The proposed algorithm achieved the highest\nmIoU of 68%. The proposed model outperformed CGNet, ContextNet, DABNet, EDANet,\nFPENet, LinkNet, and SegNet in UAVid class recognition, and achieved comparable perfor-\nmance with UnetFormer. Specifically, our model outperforms UnetFormer by 3% in static\nvehicle recognition.\nTable 3. The effectiveness of different algorithms on the UAVid dataset (Resolution: 1024 ×1024).\nModel Clutter Building Road Tree Vegetation Moving Car Static Car Human\nCGNet 53 75 74 71 54 62 32 20\nContextNet 54 76 73 72 53 61 31 18\nDABNet 57 79 76 75 58 67 38 25\nEDANet 57 79 76 74 56 65 38 24\nFPENet 47 69 67 65 46 44 17 0\nLinkNet 54 78 73 74 55 66 36 13\nSegNet 50 74 71 68 47 60 23 18\nUnetFormer 68 87 81 80 63 74 56 31\nLCNet 55 76 76 73 55 62 30 10\nOurs 68 87 81 80 63 74 59 31\nThis article compares the prediction results of different models on the Uavid dataset in\nFigure 7, with some apparent differences marked with white wireframes. From the figure,\nit can be observed that the proposed model demonstrates superior segmentation accuracy\nfor edge details compared to other models. For instance, in the areas of the house and the\ngrass beside the road highlighted in the white box, the proposed model achieves more\nprecise recognition of the house edges and the grass along the road than the other models.",
+   "## Page 13\n\nSensors 2025 ,25, 1786 13 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 13 of 19",
+   "Figure 7. Comparison of Visual Results from Di ﬀerent Models on UAVid Da taset. (The image name\nis: seq1\\00800.png).\n4.4.4. UDD6 Comparison Experiment\nTo verify the robustness of the model, we further conducted comparative experi-\nments on the UDD6 dataset, and the results are shown in Table 4. The table shows that\nthe proposed model achieved a mIoU of 67%. The proposed model outperformed other models in recognizing all categories on the UDD6 dataset. Speci ﬁcally, it surpassed the\nhighest performance of di ﬀerent models in the road catego ry by 0.7%, in the vegetation\ncategory by 2%, in the vehicle category by 1%, and in the roof category by 1.5%.\nThe data indicates that the proposed model signi ﬁcantly improves recognition accu-\nracy for the façade, road, vegetation, and r oof categories compared to other models. The\ndata suggests that the proposed model is more precise in segmenting the contours of more\nprominent categories.\nThis article visually compares the prediction results of di ﬀerent models on the UDD6\ndataset in Figure 8, with signi ﬁcant diﬀerences highlighted by white bounding boxes.\nFrom the ﬁgure, it can be observed that the prop osed model demonstrates greater accu-\nracy in segmenting edge details compared to other models. For instance, the segmentation\nof roofs and walls is more prec ise, with contours that closely match the ground truth la-\nbels. Additionally, the proposed model correctly identi ﬁes instances where other net-\nworks misclassify labels.\nTable 4. Comparison of di ﬀerent algorithms on UDD6 dataset (Resolution: 1024 × 1024).\nModel Per-Class IoU (%) mIoU F1 OA Façade Road Vegetation Vehicle Roof\nCGNet 44 57.8 33.1 60.6 43.3 47.8 64.0 72.7\nContextNet 44.3 58.9 31.7 67.8 52.4 51 66.6 76.8\nDABNet 47.4 62.1 42.3 59.8 53.2 53 68.9 76.5 EDANet 44.6 57.8 36.6 62.2 48 49.8 66.0 74.7\nFPENet 41.3 47 20.5 60 36.7 41.1 57.0 68.7\nLinkNet 43.8 56.2 20.2 65.2 44.4 46 61.4 73.3\nSegNet 32.6 46.2 20.9 57.3 31.7 37.8 53.6 64.9\nUnetFormer 62.8 69.2 60 75 64.5 66.4 70.5 60.1\nLCNet 39.9 47.3 18.7 56.9 39.8 40.5 56.4 68.6\nOurs 62 69.9 62 76 66 67.2 80.2 84.8",
+   "Figure 7. Comparison of Visual Results from Different Models on UAVid Dataset. (The image name\nis: seq1 \\00800.png).\n4.4.4. UDD6 Comparison Experiment\nTo verify the robustness of the model, we further conducted comparative experiments\non the UDD6 dataset, and the results are shown in Table 4. The table shows that the\nproposed model achieved a mIoU of 67%. The proposed model outperformed other models\nin recognizing all categories on the UDD6 dataset. Specifically, it surpassed the highest\nperformance of different models in the road category by 0.7%, in the vegetation category\nby 2%, in the vehicle category by 1%, and in the roof category by 1.5%.\nTable 4. Comparison of different algorithms on UDD6 dataset (Resolution: 1024 ×1024).\nModelPer-Class IoU (%)mIoU F1 OA\nFaçade Road Vegetation Vehicle Roof\nCGNet 44 57.8 33.1 60.6 43.3 47.8 64.0 72.7\nContextNet 44.3 58.9 31.7 67.8 52.4 51 66.6 76.8\nDABNet 47.4 62.1 42.3 59.8 53.2 53 68.9 76.5\nEDANet 44.6 57.8 36.6 62.2 48 49.8 66.0 74.7\nFPENet 41.3 47 20.5 60 36.7 41.1 57.0 68.7\nLinkNet 43.8 56.2 20.2 65.2 44.4 46 61.4 73.3\nSegNet 32.6 46.2 20.9 57.3 31.7 37.8 53.6 64.9\nUnetFormer 62.8 69.2 60 75 64.5 66.4 70.5 60.1\nLCNet 39.9 47.3 18.7 56.9 39.8 40.5 56.4 68.6\nOurs 62 69.9 62 76 66 67.2 80.2 84.8\nThe data indicates that the proposed model significantly improves recognition accu-\nracy for the façade, road, vegetation, and roof categories compared to other models. The\ndata suggests that the proposed model is more precise in segmenting the contours of more\nprominent categories.\nThis article visually compares the prediction results of different models on the UDD6\ndataset in Figure 8, with significant differences highlighted by white bounding boxes. From\nthe figure, it can be observed that the proposed model demonstrates greater accuracy in\nsegmenting edge details compared to other models. For instance, the segmentation of\nroofs and walls is more precise, with contours that closely match the ground truth labels.\nAdditionally, the proposed model correctly identifies instances where other networks\nmisclassify labels.",
+   "## Page 14\n\nSensors 2025 ,25, 1786 14 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 14 of 19",
+   "Figure 8. Comparison of visual results from di ﬀerent models on the UDD6 dataset. (The image name\nis: DJI_0667.JPG).\n4.4.5. LoveDA Ablation Study\nIn order to verify the universality of the model in this article, the LoveDa dataset was\nselected, which includes urban and rural scenarios to validate the universality of this ar-\nticle. The results are shown in the Table 5. The GLAM module proposed in this article has\nsigniﬁcantly improved in various categories on the baseline model, with improvements\nof 8.4%, 17.8%, and 9.6% in the road, bare soil, and cultivated land categories, 8.6% in\nmIoU, 6.7% in the F1 value, and 5.5% in th e OA value. After adding the SLFM module,\nthe model in this article showed good improvement in recognition rates for various types,\nwith improvements of 2.8%, 1.9%, and 2.9% in the background, building, and bare soil\ncategories, respectively. It also showed a 2% increase in mIoU, a 1.5% increase in the F1\nvalue, and a 1.5% increase in the OA value.\nTable 5. Comparison of di ﬀerent algorithms on LoveDA dataset (Resolution: 1024 × 1024).\nModel Per-Class IoU (%)   mIoU (%) F1 (%) OA (%) Background Building Road Water Barren Forest Agriculture\nUnet 58.4 64.3 59.9 73.4 43.2 49.8 65.6 59.2 73.9 75.8\nUnet + GLAM 63.5 69.8 68.3 77.9 61.0 56.7 75.2 67.8 80.6 81.3\nUnet + GLAM +\nSLFM 66.3 71.7 69.7 79.4 63.9 57.9 76.7 69.8 82.1 82.8\nThis article visualizes the ablation expe riments conducted on the LoveDA dataset.\nAs shown in Figure 9, the model proposed in this paper performs be tter in edge segmen-\ntation compared to the baseline model, and performs be tter in edge segmentation between\nadjacent di ﬀerent objects. In Figure 9a, the black wireframe shows be tter segmentation\nperformance for the edges of buildings and roads compared to the baseline model.\nFigure 8. Comparison of visual results from different models on the UDD6 dataset. (The image name\nis: DJI_0667.JPG).\n4.4.5. LoveDA Ablation Study\nIn order to verify the universality of the model in this article, the LoveDa dataset\nwas selected, which includes urban and rural scenarios to validate the universality of this\narticle. The results are shown in the Table 5. The GLAM module proposed in this article\nhas significantly improved in various categories on the baseline model, with improvements\nof 8.4%, 17.8%, and 9.6% in the road, bare soil, and cultivated land categories, 8.6% in\nmIoU, 6.7% in the F1 value, and 5.5% in the OA value. After adding the SLFM module,\nthe model in this article showed good improvement in recognition rates for various types,\nwith improvements of 2.8%, 1.9%, and 2.9% in the background, building, and bare soil\ncategories, respectively. It also showed a 2% increase in mIoU, a 1.5% increase in the F1\nvalue, and a 1.5% increase in the OA value.\nTable 5. Comparison of different algorithms on LoveDA dataset (Resolution: 1024 ×1024).\nModelPer-Class IoU (%) mIoU\n(%)F1 (%)OA\n(%) Background Building Road Water Barren Forest Agriculture\nUnet 58.4 64.3 59.9 73.4 43.2 49.8 65.6 59.2 73.9 75.8\nUnet + GLAM 63.5 69.8 68.3 77.9 61.0 56.7 75.2 67.8 80.6 81.3\nUnet + GLAM +\nSLFM66.3 71.7 69.7 79.4 63.9 57.9 76.7 69.8 82.1 82.8\nThis article visualizes the ablation experiments conducted on the LoveDA dataset. As\nshown in Figure 9, the model proposed in this paper performs better in edge segmentation\ncompared to the baseline model, and performs better in edge segmentation between\nadjacent different objects. In Figure 9a, the black wireframe shows better segmentation\nperformance for the edges of buildings and roads compared to the baseline model.",
+   "## Page 15\n\nSensors 2025 ,25, 1786 15 of 19\nSensors 2025 , 25, x FOR PEER REVIEW 15 of 19",
+   "Figure 9. LoveDA ablation study. (The ( a) image name is: urban\\4178.png, the ( b) image name is:\nrural\\2522.png).\n4.4.6. LoveDA Comparison Experiment\nThis article conducted comparative experiments with other models on the LoveDA\ndataset, as shown in Table 6. The model prop osed in this article has shown certain im-\nprovements in various types of recognition compared to other models, achieving the high-\nest recognition rate in each type. Among them, compared with other models with the highest recognition rates, the background class improved by 0.6%, the building class im-\nproved by 1%, the road class improved by 1. 3%, the water body class improved by 0.6%,\nthe bare soil class improved by 0.7%, the fo rest class improved by 0.9%, and the mIoU\nclass improved by 1.3%, The F1 value increa sed by 1%, and the OA value increased by\n0.8%. From a data perspective, the model prop osed in this article has improved its ability\nto recognize regular edges for similar buildings and roads.\nTable 6. Eﬀect of the modules on the LoveDA dataset.\nModel Per-Class IoU (%)   mIoU (%) F1 (%) OA (%) Background Building Road Water Barren Forest Agriculture\nCGNet 56.8 59.1 55.1  71.6 36.6 47.7 63.8 55.9 71.1 74.1\nContextNet 56.8 57.7 55.4 72.2 37.6 47.8 64.8 56.1 71.2 74.2\nDABNet 59.0 64.5 61.8 74.5 49.1 51.3 68.4 61.2 75.6 77.1 EDANet 58.1 63.2 60.1 73.7 46.2 50.0 67.3 59.8 74.4 76.2\nFPENet 52.8 45.8 37.9 64.6 25.0 41.1 56.0 46.2 62.2 68.0\nLinkNet 58.3 63.0 59.8  73.8 43.5 50.1 67.3 59.3 74.1 76.2\nSegNet 53.4 51.8 46.9 60.4 28.0 46.3 58.3 49.3 65.4 69.3\nUNetFormer 65.7 70.7 68.5 78.8 63.2 57.0 75.6 68.5 81.1 82.0\nLCNet 57.1 61.9 57.0  73.0 43.0 48.3 66.0 58.0 73.0 75.2\nOurs 66.3 71.7 69.7 79.4 63.9 57.9 76.7 69.8 82.1 82.8\nFigure 9. LoveDA ablation study. (The ( a) image name is: urban \\4178.png, the ( b) image name\nis: rural \\2522.png).\n4.4.6. LoveDA Comparison Experiment\nThis article conducted comparative experiments with other models on the LoveDA\ndataset, as shown in Table 6. The model proposed in this article has shown certain improve-\nments in various types of recognition compared to other models, achieving the highest\nrecognition rate in each type. Among them, compared with other models with the highest\nrecognition rates, the background class improved by 0.6%, the building class improved by\n1%, the road class improved by 1.3%, the water body class improved by 0.6%, the bare soil\nclass improved by 0.7%, the forest class improved by 0.9%, and the mIoU class improved\nby 1.3%, The F1 value increased by 1%, and the OA value increased by 0.8%. From a data\nperspective, the model proposed in this article has improved its ability to recognize regular\nedges for similar buildings and roads.\nTable 6. Effect of the modules on the LoveDA dataset.\nModelPer-Class IoU (%)mIoU\n(%)F1 (%) OA (%)Background Building Road Water Barren Forest Agriculture\nCGNet 56.8 59.1 55.1 71.6 36.6 47.7 63.8 55.9 71.1 74.1\nContextNet 56.8 57.7 55.4 72.2 37.6 47.8 64.8 56.1 71.2 74.2\nDABNet 59.0 64.5 61.8 74.5 49.1 51.3 68.4 61.2 75.6 77.1\nEDANet 58.1 63.2 60.1 73.7 46.2 50.0 67.3 59.8 74.4 76.2\nFPENet 52.8 45.8 37.9 64.6 25.0 41.1 56.0 46.2 62.2 68.0\nLinkNet 58.3 63.0 59.8 73.8 43.5 50.1 67.3 59.3 74.1 76.2\nSegNet 53.4 51.8 46.9 60.4 28.0 46.3 58.3 49.3 65.4 69.3\nUNetFormer 65.7 70.7 68.5 78.8 63.2 57.0 75.6 68.5 81.1 82.0\nLCNet 57.1 61.9 57.0 73.0 43.0 48.3 66.0 58.0 73.0 75.2\nOurs 66.3 71.7 69.7 79.4 63.9 57.9 76.7 69.8 82.1 82.8",
+   "## Page 16\n\nSensors 2025 ,25, 1786 16 of 19\nThis article compares the visualization results of each model, as shown in the figure. In\nFigure 10a, compared with other models, the model proposed in this paper has significantly\nimproved the object edge segmentation effect, especially in the black wireframe where\neffective segmentation was performed on the edge parts contained in adjacent objects. In\nFigure 10b, the model proposed in this article performs well in segmenting rural scenes.\nFor example, in the black wireframe, the segmentation effect of bare soil and forest edges is\ncloser to the real segmentation.\nSensors 2025 , 25, x FOR PEER REVIEW 16 of 19\n\n This article compares the visualization results of each model, as shown in the ﬁgure.\nIn Figure 10a, compared with other models, the model proposed in this paper has signif-\nicantly improved the object edge segmentation e ﬀect, especially in the black wireframe\nwhere eﬀective segmentation was performed on the edge parts contained in adjacent ob-\njects. In Figure 10b, the model proposed in th is article performs well  in segmenting rural\nscenes. For example, in the black wireframe, the segmentation e ﬀect of bare soil and forest\nedges is closer to the real segmentation.",
+   "Figure 10. Comparison of visual results from di ﬀerent models on the LoveDA dataset. (The ( a) im-\nage name is: urban\\4178.png, the ( b) image name is: rural\\2522.png).\n4.4.7. Comparison of Computational Complexity\nThis article will present a comparison be tween the parameter count, computational\ncomplexity, and inference speed of di ﬀerent models, as shown in Table 7. The model pro-\nposed in this article has a slight advantage in  terms of speed. In terms of inference speed,\nthe FPS of our model is 72.4, slightly higher than CGNet, FPENet, and FPENet. However,\nthe model in this article has a parameter count of 12.1 M, which is only lower than SegNet and slightly lower than LinkNet and UnetFomer. In terms of computational complexity,\nit is 49.24 G, only lower than LinkNet and SegNet, and slightly lower than UnetFomer.\nBased on the segmentation performance of Tabl es 4–6 on various datasets, it can be seen\nthat our model has e ﬀectively improved segmentation accuracy compared to other mod-\nels. This advantage makes our model suitable for the real-time segmentation of low-\nFigure 10. Comparison of visual results from different models on the LoveDA dataset. (The ( a) image\nname is: urban \\4178.png, the ( b) image name is: rural \\2522.png).\n4.4.7. Comparison of Computational Complexity\nThis article will present a comparison between the parameter count, computational\ncomplexity, and inference speed of different models, as shown in Table 7. The model\nproposed in this article has a slight advantage in terms of speed. In terms of inference\nspeed, the FPS of our model is 72.4, slightly higher than CGNet, FPENet, and FPENet.\nHowever, the model in this article has a parameter count of 12.1 M, which is only lower\nthan SegNet and slightly lower than LinkNet and UnetFomer. In terms of computational\ncomplexity, it is 49.24 G, only lower than LinkNet and SegNet, and slightly lower than\nUnetFomer. Based on the segmentation performance of Tables 4–6 on various datasets, it\ncan be seen that our model has effectively improved segmentation accuracy compared to\nother models. This advantage makes our model suitable for the real-time segmentation of\nlow- altitude drone images.",
+   "## Page 17",
+   "Sensors 2025 ,25, 1786 17 of 19\nTable 7. Comparison of parameter quantity and speed among different models.\nModel Params Flops Speed\nCGNet 492 K 14.24 G 64.7\nContextNet 874 K 3.59 G 147.7\nDABNet 753 K 21.6 G 81.3\nEDANet 683 K 17.83 G 96.3\nFPENet 114 K 3.15 G 71.7\nLinkNet 11.5 M 49.0 G 113.6\nSegNet 29.4 M 645.12 G 18.5\nUNetFormer 11.8 M 46.97 G 83.1\nLCNet 508 K 15.98 G 102.1\nOurs 12.1 M 48.24 G 72.4\n5. Discussion\nThe article designs a global–local attention module for extracting global features and a\nshallow-feature fusion module. The global–local attention module adopts a dual-branch\nstructure, where a lightweight attention mechanism is introduced into the global branch to\naccount for the real-time requirements of drone tasks. The global features extracted from a\nsingle global branch lack certain local information. Therefore, an additional local branch is\ndesigned to capture local information and then fused with global features to address this\nissue. As shown in Figure 5, the visualization results of the global–local module added\nto the baseline model enhance the recognition of walls, making it more aligned with the\nactual labels.\nThe low-level-feature fusion module utilizes features from the U-Net’s down-sampling\nlayers. The shallowest down-sampled features contain rich spatial information but have\nlimited semantic information, while the deeper ones are rich in semantic information but\nlack spatial details. This article designs a shallow-feature module to fuse deep and shallow\nfeatures, which are then output for the decoder’s feature fusion, solving the problem of\ndeep feature output from the decoder lacking spatial information, especially for small object\nrecognition, as shown in Figure 6. Although this module is added to the skip connections\nin the U-Net to reduce its impact on model speed, it is only added at the top layer, thus not\nsignificantly affecting the overall speed of the model, as shown in Table 3.\nHowever, the recognition performance of the model proposed in this article is not\nsatisfactory in some classes. As shown in Tables 2 and 3, the recognition performance of our\nmodel in the Human class on the UAVid dataset is poor. Combined with the performance\nof our model on the UDD6, UAVid, and LoveDA datasets, as shown in Figures 5–10,\nour model performs well in object edge segmentation. However, there is still room for\nimprovement in small object segmentation.\n6. Conclusions\nThis paper proposes a real-time semantic segmentation algorithm based on a channel\nattention mechanism. The model primarily comprises an encoder, a global–local attention\nmodule, and a shallow-feature fusion module.\nFirst, a multi-scale shallow-feature fusion module is designed in the top-level skip\nconnections to enhance features by integrating the characteristics from different stages of\nthe encoder.\nSecond, the proposed global–local attention module effectively combines global and\nlocal information in channel and spatial dimensions, resulting in better feature extraction.\nThe proposed model achieves a real-time performance of 72.4 FPS with an input\nresolution of 1024 ×1024 on the UAVid test set, with an accuracy of 68% mIoU. Similarly,\nthe UDD6 test set achieves an accuracy of 67% mIoU at the exact resolution, demonstrating",
+   "## Page 18",
+   "Sensors 2025 ,25, 1786 18 of 19\nthe effectiveness of the proposed model. The proposed model achieves a better balance\nbetween accuracy and real-time performance than other algorithms.\nAuthor Contributions: Conceptualization, G.L.; Methodology, G.L.; Software, Z.Z.; Validation, Z.Z.;\nFormal analysis, Z.Z.; Writing—original draft, Z.Z.; Writing—review & editing, G.L. All authors have\nread and agreed to the published version of the manuscript.\nFunding: This research received no external funding.\nData Availability Statement: All data included in this study are available upon request by contact\nwith the corresponding author.\nConflicts of Interest: The authors declare no conflict of interest.\nAbbreviations\nThe following abbreviations are used in this manuscript.\nmIoU mean Intersection over Union\nGLAM global–local attention module\nSLFM shallow layer feature fusion Module\nReferences\n1. Chowdhury, T.; Rahnemoonfar, M.; Murphy, R.; Fernandes, O. Comprehensive semantic segmentation on high resolution UAV\nimagery for natural disaster damage assessment. In Proceedings of the 2020 IEEE International Conference on Big Data (Big\nData), Atlanta, GA, USA, 10–13 December 2020; pp. 3904–3913. [CrossRef]\n2. Rahnemoonfar, M.; Chowdhury, T.; Murphy, R. RescueNet: A high resolution UAV semantic segmentation dataset for natural\ndisaster damage assessment. Sci. Data 2023 ,10, 913. [CrossRef] [PubMed]\n3. Tijtgat, N.; Van Ranst, W.; Volckaert, B.; Goedemé, T.; De Turck, F. Embedded real-time object detection for a UAV warning\nsystem. In Proceedings of the 2017 IEEE International Conference on Computer Vision Workshops (ICCVW), Venice, Italy,\n22–29 October 2017; pp. 2110–2118. [CrossRef]\n4. Lu, Y.-R.; Sun, D. Development of real-time unmanned aerial vehicle urban object detection system with federated learning.\nJ. Aerosp. Inf. Syst. 2024 ,21, 547–553. [CrossRef]\n5. Ke, R.; Li, Z.; Tang, J.; Pan, Z.; Wang, Y. Real-time traffic flow parameter estimation from UAV video based on ensemble classifier\nand optical flow. IEEE Trans. Intell. Transp. Syst. 2019 ,20, 54–64. [CrossRef]\n6. Tsouros, D.C.; Bibi, S.; Sarigiannidis, P .G. A review on UAV-based applications for precision agriculture. Information 2019 ,\n10, 349. [CrossRef]\n7. Bouguettaya, A.; Zarzour, H.; Taberkit, A.M.; Kechida, A. A review on early wildfire detection from unmanned aerial vehicles\nusing deep learning-based computer vision algorithms. Signal Process. 2022 ,190, 108309. [CrossRef]\n8. Badrinarayanan, V .; Kendall, A.; Cipolla, R. SegNet: A deep convolutional encoder-decoder architecture for image segmentation.\nIEEE Trans. Pattern Anal. Mach. Intell. 2017 ,39, 2481–2495. [CrossRef] [PubMed]\n9. He, K.; Zhang, X.; Ren, S.; Sun, J. Deep residual learning for image recognition. In Proceedings of the 2016 IEEE Conference on\nComputer Vision and Pattern Recognition (CVPR), Las Vegas, NV , USA, 27–30 June 2016; pp. 770–778. [CrossRef]\n10. Liu, M.; Yin, H. Efficient pyramid context encoding and feature embedding for semantic segmentation. Image Vis. Comput. 2021 ,\n111, 104195. [CrossRef]\n11. Yu, C.; Wang, J.; Peng, C.; Gao, C.; Yu, G.; Sang, N. Bisenet: Bilateral segmentation network for real-time semantic segmentation.\nIn Proceedings of the European Conference on Computer Vision (ECCV), Munich, Germany, 8–14 September 2018; pp. 325–341.\n12. Fan, M.; Lai, S.; Huang, J.; Wei, X.; Chai, Z.; Luo, J.; Wei, X. Rethinking bisenet for real-time semantic segmentation. In Proceedings\nof the IEEE/CVF Conference on Computer Vision and Pattern Recognition, Nashville, TN, USA, 19–25 June 2021; pp. 9716–9725.\n13. Zhang, W.; Huang, Z.; Luo, G.; Chen, T.; Wang, X.; Liu, W.; Yu, G.; Shen, C. Topformer: Token pyramid transformer for mobile\nsemantic segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, New Orleans,\nLA, USA, 18–24 June 2022; pp. 12083–12093.\n14. Wang, L.; Li, R.; Zhang, C.; Fang, S.; Duan, C.; Meng, X.; Atkinson, P .M. UNetFormer: A UNet-like transformer for efficient\nsemantic segmentation of remote sensing urban scene imagery. ISPRS J. Photogramm. Remote Sens. 2022 ,190, 196–214. [CrossRef]\n15. Hu, J.; Shen, L.; Sun, G. Squeeze-and-excitation networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern\nRecognition, Salt Lake City, UT, USA, 18–23 June 2018; pp. 7132–7141.",
+   "## Page 19",
+   "Sensors 2025 ,25, 1786 19 of 19\n16. Woo, S.; Park, J.; Lee, J.-Y.; Kweon, I.S. Cbam: Convolutional block attention module. In Proceedings of the European Conference\non Computer Vision (ECCV), Munich, Germany, 8–14 September 2018; pp. 3–19.\n17. Misra, D.; Nalamada, T.; Arasanipalai, A.U.; Hou, Q. Rotate to attend: Convolutional triplet attention module. In Proceedings\nof the 2021 IEEE Winter Conference on Applications of Computer Vision (WACV), Waikoloa, HI, USA, 3–8 January 2021;\npp. 3138–3147. [CrossRef]\n18. Hou, Q.; Zhou, D.; Feng, J. Coordinate attention for efficient mobile network design. In Proceedings of the 2021 IEEE/CVF Con-\nference on Computer Vision and Pattern Recognition (CVPR), Nashville, TN, USA, 19–25 June 2021; pp. 13708–13717. [CrossRef]\n19. Lyu, Y.; Vosselman, G.; Xia, G.-S.; Yilmaz, A.; Yang, M.Y. UAVid: A semantic segmentation dataset for UAV imagery.\nISPRS J. Photogramm. Remote Sens. 2020 ,165, 108–119. [CrossRef]\n20. Chen, Y.; Wang, Y.; Lu, P .; Chen, Y.; Wang, G. Large-scale structure from motion with semantic constraints of aerial images. In\nPattern Recognition and Computer Vision: Proceedings of the First Chinese Conference, PRCV 2018, Guangzhou, China, 23–26 November\n2018, Proceedings, Part I 1 ; Springer: Berlin/Heidelberg, Germany, 2018; pp. 347–359.\n21. Wang, J.; Zheng, Z.; Ma, A.; Lu, X.; Zhong, Y. LoveDA: A remote sensing land-cover dataset for domain adaptive semantic\nsegmentation. arXiv 2021 , arXiv:2110.08733.\n22. Wu, T.; Tang, S.; Zhang, R.; Cao, J.; Zhang, Y. CGNet: A lightweight context guided network for semantic segmentation. IEEE\nTrans. Image Process. 2021 ,30, 1169–1179. [CrossRef] [PubMed]\n23. Poudel, R.P .; Bonde, U.; Liwicki, S.; Zach, C. Contextnet: Exploring context and detail for semantic segmentation in real-time.\narXiv 2018 , arXiv:1805.04554.\n24. Li, G.; Yun, I.; Kim, J.; Kim, J. Dabnet: Depth-wise asymmetric bottleneck for real-time semantic segmentation.\narXiv 2019 , arXiv:1907.11357.\n25. Lo, S.-Y.; Hang, H.-M.; Chan, S.-W.; Lin, J.-J. Efficient dense modules of asymmetric convolution for real-time semantic segmen-\ntation. In Proceedings of the 1st ACM International Conference on Multimedia in Asia, Beijing, China, 16–18 December 2019;\npp. 1–6.\n26. Chaurasia, A.; Culurciello, E. Linknet: Exploiting encoder representations for efficient semantic segmentation. In Proceedings\nof the 2017 IEEE Visual Communications and Image Processing (VCIP), St. Petersburg, FL, USA, 10–13 December 2017; IEEE:\nPiscataway, NJ, USA, 2017; pp. 1–4.\n27. Liu, S.; Cheng, J.; Liang, L.; Bai, H.; Dang, W. Lightweight Semantic Segmentation Network for UAV Remote Sensing Images.\nIEEE J. Sel. Top. Appl. Earth Obs. Remote Sens. 2021 ,14, 8287–8296. [CrossRef]\nDisclaimer/Publisher’s Note: The statements, opinions and data contained in all publications are solely those of the individual\nauthor(s) and contributor(s) and not of MDPI and/or the editor(s). MDPI and/or the editor(s) disclaim responsibility for any injury to\npeople or property resulting from any ideas, methods, instructions or products referred to in the content."
+  ],
+  "chunk_meta": [
+   {
+    "chunk_id": "C0",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "sensors-25-01786"
+   },
+   {
+    "chunk_id": "C1",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 1"
+   },
+   {
+    "chunk_id": "C2",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": ""
+   },
+   {
+    "chunk_id": "C3",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 2"
+   },
+   {
+    "chunk_id": "C4",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": ""
+   },
+   {
+    "chunk_id": "C5",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 3"
+   },
+   {
+    "chunk_id": "C6",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C7",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 4"
+   },
+   {
+    "chunk_id": "C8",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": ""
+   },
+   {
+    "chunk_id": "C9",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 5"
+   },
+   {
+    "chunk_id": "C10",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": ""
+   },
+   {
+    "chunk_id": "C11",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": "Page 6"
+   },
+   {
+    "chunk_id": "C12",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 7"
+   },
+   {
+    "chunk_id": "C13",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": ""
+   },
+   {
+    "chunk_id": "C14",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 8"
+   },
+   {
+    "chunk_id": "C15",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": ""
+   },
+   {
+    "chunk_id": "C16",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 9"
+   },
+   {
+    "chunk_id": "C17",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C18",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 10"
+   },
+   {
+    "chunk_id": "C19",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C20",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 11"
+   },
+   {
+    "chunk_id": "C21",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C22",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 12"
+   },
+   {
+    "chunk_id": "C23",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C24",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 13"
+   },
+   {
+    "chunk_id": "C25",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C26",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C27",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 14"
+   },
+   {
+    "chunk_id": "C28",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C29",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 15"
+   },
+   {
+    "chunk_id": "C30",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C31",
+    "chunk_type": "figure",
+    "mode": "MODE_VISION",
+    "header": "Page 16"
+   },
+   {
+    "chunk_id": "C32",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C33",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 17"
+   },
+   {
+    "chunk_id": "C34",
+    "chunk_type": "table",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C35",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 18"
+   },
+   {
+    "chunk_id": "C36",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": ""
+   },
+   {
+    "chunk_id": "C37",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": "Page 19"
+   },
+   {
+    "chunk_id": "C38",
+    "chunk_type": "text",
+    "mode": "MODE_REASONING",
+    "header": ""
+   }
+  ],
+  "overview": "TITLE: UA V Imagery Real-Time Semantic Segmentation with Global–Local Information Attention\n\nUNDERSTANDING: This paper proposes a method for real-time semantic segmentation of drones that integrates multi-scale global context information. The method utilizes a UNet structure, with the encoder employing a Resnet18 network to extract features. The decoder incorporates a global–local attention module, where the global branch compresses and extracts global information in both vertical and horizontal directions, and the local branch extracts local information through convolution. The model was tested on the UAvid and UDD6 datasets, achieving accuracies of 68% mIoU and 67% mIoU, respectively.\n\nTOPICS COVERED: real-time semantic segmentation, drone imagery, feature fusion, global context information, convolutional neural networks (CNNs), semantic segmentation, lightweight semantic segmentation model, UAvid dataset, UDD6 dataset\n\nSECTION MAP:\n  - Introduction [C0, C1]: Background and motivation for real-time semantic segmentation of drones\n  - Method [C2, C3, C4]: Proposed method for real-time semantic segmentation of drones\n  - Results [C5]: Experimental results of the proposed method\n\nKEY CONCEPTS: UNet structure, Resnet18 network, global–local attention module, UAvid dataset, UDD6 dataset\n\nMETHODOLOGY: The proposed method utilizes a UNet structure, with the encoder employing a Resnet18 network to extract features. The decoder incorporates a global–local attention module, where the global branch compresses and extracts global information in both vertical and horizontal directions, and the local branch extracts local information through convolution.\n\nDATASETS: UAvid dataset, UDD6 dataset\n\nCONCLUSIONS: The proposed model balances accuracy and real-time performance well, achieving accuracies of 68% mIoU and 67% mIoU on the UAvid and UDD6 datasets, respectively.",
+  "chunk_topics": {
+   "C0": [
+    "real-time semantic segmentation",
+    "drone imagery",
+    "feature fusion",
+    "global context information",
+    "introduction"
+   ],
+   "C1": [
+    "semantic segmentation",
+    "convolutional neural networks (cnns)",
+    "lightweight semantic segmentation model",
+    "introduction"
+   ],
+   "C2": [
+    "ua v imagery real-time semantic segmentation with global–local information attention",
+    "unet structure",
+    "resnet18 network",
+    "method"
+   ],
+   "C3": [
+    "global–local attention module",
+    "global branch",
+    "local branch",
+    "method"
+   ],
+   "C4": [
+    "uavid dataset",
+    "udd6 dataset",
+    "semantic segmentation results",
+    "method"
+   ],
+   "C5": [
+    "experimental results",
+    "accuracy",
+    "inference time",
+    "results"
+   ],
+   "C6": [
+    "real-time semantic segmentation",
+    "network architecture",
+    "single-branch networks",
+    "dual-branch networks",
+    "u-shaped networks",
+    "method|other"
+   ],
+   "C7": [
+    "global contextual information module",
+    "attention mechanisms",
+    "channel attention",
+    "spatial attention",
+    "method|other"
+   ],
+   "C8": [
+    "global contextual information module",
+    "coordinate attention mechanism",
+    "dual-branch module",
+    "method|other"
+   ],
+   "C9": [
+    "network principles",
+    "unet structure",
+    "resnet18 model",
+    "global–local attention mechanism",
+    "shallow-feature fusion module",
+    "method|other"
+   ],
+   "C15": [
+    "shallow layer feature fusion module network structure",
+    "dataset",
+    "urban scene semantic segmentation tasks",
+    "method|results|discussion|references|other"
+   ],
+   "C16": [
+    "dataset",
+    "division",
+    "training images",
+    "test images",
+    "method|results|discussion|references|other"
+   ],
+   "C17": [
+    "dataset",
+    "division",
+    "facades",
+    "roads",
+    "vegetation",
+    "cars",
+    "roofs",
+    "others",
+    "method|results|discussion|references|other"
+   ],
+   "C18": [
+    "dataset",
+    "division",
+    "background",
+    "buildings",
+    "roads",
+    "water bodies",
+    "bare soil",
+    "forest land",
+    "cultivated land",
+    "method|results|discussion|references|other"
+   ],
+   "C19": [
+    "comparative analysis",
+    "experimental results",
+    "udd6 dataset",
+    "uavid dataset",
+    "evaluation metrics",
+    "model performance",
+    "results"
+   ],
+   "C20": [
+    "ablation study",
+    "uavid dataset",
+    "results"
+   ],
+   "C21": [
+    "ablation study",
+    "udd6 dataset",
+    "uavid dataset",
+    "model performance",
+    "results"
+   ],
+   "C22": [
+    "ablation study",
+    "uavid dataset",
+    "model performance",
+    "results"
+   ],
+   "C23": [
+    "ablation study",
+    "comparative study",
+    "uavid dataset",
+    "network models",
+    "results"
+   ],
+   "C24": [
+    "sensors",
+    "peer review",
+    "other"
+   ],
+   "C25": [
+    "udd6 dataset",
+    "comparative experiments",
+    "table 4",
+    "model performance",
+    "results"
+   ],
+   "C26": [
+    "udd6 dataset",
+    "comparative experiments",
+    "table 4",
+    "model performance",
+    "results"
+   ],
+   "C27": [
+    "sensors",
+    "peer review",
+    "other"
+   ],
+   "C28": [
+    "ablation study",
+    "loveda dataset",
+    "edge segmentation",
+    "results"
+   ],
+   "C29": [
+    "sensors",
+    "peer review",
+    "other"
+   ],
+   "C30": [
+    "loveda comparison experiment",
+    "comparative experiments",
+    "model comparison",
+    "results"
+   ],
+   "C31": [
+    "object edge segmentation",
+    "model comparison",
+    "visualization results",
+    "results"
+   ],
+   "C32": [
+    "computational complexity",
+    "parameter count",
+    "inference speed",
+    "results"
+   ],
+   "C33": [
+    "low-altitude drone images",
+    "real-time segmentation",
+    "discussion"
+   ],
+   "C34": [
+    "low-altitude drone images",
+    "real-time segmentation",
+    "discussion"
+   ],
+   "C35": [
+    "real-time semantic segmentation",
+    "channel attention mechanism",
+    "global-local attention module",
+    "conclusion"
+   ],
+   "C36": [
+    "effectiveness",
+    "balance",
+    "accuracy",
+    "real-time performance",
+    "discussion|method|results"
+   ],
+   "C37": [
+    "abbreviations",
+    "miou",
+    "glam",
+    "slfm",
+    "introduction|method|results"
+   ],
+   "C38": [
+    "references",
+    "semantic segmentation",
+    "uav imagery",
+    "real-time performance",
+    "references|method|results"
+   ]
+  },
+  "is_processed": true
+ }
+}

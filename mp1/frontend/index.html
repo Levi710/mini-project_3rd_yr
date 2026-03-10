@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pluto — Pipeline Dashboard</title>
+  <meta name="description" content="Pluto v1.0: Real mode-switching extraction pipeline with evidence verification">
+  <link rel="stylesheet" href="/static/style.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header__brand">
+      <div class="header__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#grad)" stroke-width="2.5" fill="none" />
+          <path d="M14 6 L14 22 M8 14 L20 14" stroke="url(#grad)" stroke-width="2" stroke-linecap="round" />
+          <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="28" y2="28">
+              <stop offset="0%" stop-color="#7c3aed" />
+              <stop offset="100%" stop-color="#c084fc" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 class="header__title">Pluto</h1>
+      <span class="header__badge">v1.0</span>
+    </div>
+    <p class="header__subtitle">Real Mode-Switching Extraction Pipeline</p>
+  </header>
+
+  <!-- ── Query Bar ──────────────────────────────────────────────── -->
+  <section class="query-bar" id="querySection">
+    <div class="query-bar__inner">
+      <input type="text" id="queryInput" class="query-bar__input" placeholder="Enter your research query…"
+        autocomplete="off">
+      <button id="runBtn" class="query-bar__btn" disabled style="opacity:0.5;cursor:not-allowed;">
+        <span class="btn-icon">▶</span> Run Pipeline
+      </button>
+    </div>
+  </section>
+
+  <!-- ── File Upload Zone ──────────────────────────────────────── -->
+  <section class="upload-zone" id="uploadZone">
+    <div class="upload-zone__inner">
+      <div class="upload-zone__droparea" id="dropArea">
+        <div class="upload-zone__icon">📎</div>
+        <div class="upload-zone__text">
+          <strong>Drop files here</strong> or
+          <label class="upload-zone__browse" for="fileInput">browse</label>
+        </div>
+        <div class="upload-zone__hint">PDF, DOCX, TXT, MD — max 10MB each</div>
+        <input type="file" id="fileInput" class="upload-zone__input" multiple
+          accept=".pdf,.docx,.doc,.txt,.md,.markdown">
+      </div>
+      <div class="upload-zone__status" id="uploadStatus"></div>
+      <div class="upload-zone__corpus" id="corpusList">
+        <div class="corpus-header">
+          <span class="corpus-header__title">📁 Corpus Documents</span>
+          <button class="corpus-header__refresh" id="refreshCorpus" title="Refresh">↻</button>
+        </div>
+        <div class="corpus-docs" id="corpusDocs">Loading…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stage Rail ─────────────────────────────────────────────── -->
+  <section class="stage-rail" id="stageRail">
+    <div class="stage-rail__track">
+      <div class="stage-card" data-stage="route" id="stage-route">
+        <div class="stage-card__number">S0</div>
+        <div class="stage-card__label">ROUTE</div>
+        <div class="stage-card__status" id="status-route">idle</div>
+      </div>
+      <div class="stage-rail__connector"></div>
+      <div class="stage-card" data-stage="extract" id="stage-extract">
+        <div class="stage-card__number">S1</div>
+        <div class="stage-card__label">EXTRACT</div>
+        <div class="stage-card__status" id="status-extract">idle</div>
+      </div>
+      <div class="stage-rail__connector"></div>
+      <div class="stage-card" data-stage="merge" id="stage-merge">
+        <div class="stage-card__number">S2</div>
+        <div class="stage-card__label">MERGE</div>
+        <div class="stage-card__status" id="status-merge">idle</div>
+      </div>
+      <div class="stage-rail__connector"></div>
+      <div class="stage-card" data-stage="verify" id="stage-verify">
+        <div class="stage-card__number">S3</div>
+        <div class="stage-card__label">VERIFY</div>
+        <div class="stage-card__status" id="status-verify">idle</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main Content ───────────────────────────────────────────── -->
+  <main class="dashboard" id="dashboard">
+    <!-- Answer Panel -->
+    <section class="panel panel--answer" id="answerPanel">
+      <h2 class="panel__title">
+        <span class="panel__icon">📝</span> Final Answer
+      </h2>
+      <div class="panel__body" id="answerBody">
+        <p class="panel__placeholder">Run a query to see results…</p>
+      </div>
+    </section>
+
+    <!-- Evidence Panel -->
+    <section class="panel panel--evidence" id="evidencePanel">
+      <h2 class="panel__title">
+        <span class="panel__icon">🔗</span> Evidence
+      </h2>
+      <div class="panel__body" id="evidenceBody">
+        <p class="panel__placeholder">No evidence yet</p>
+      </div>
+    </section>
+
+    <!-- Trace Panel -->
+    <section class="panel panel--trace" id="tracePanel">
+      <h2 class="panel__title">
+        <span class="panel__icon">📊</span> Trace Summary
+      </h2>
+      <div class="panel__body" id="traceBody">
+        <p class="panel__placeholder">Pipeline trace will appear here</p>
+      </div>
+    </section>
+
+    <!-- Confidence Meter -->
+    <section class="panel panel--confidence" id="confidencePanel">
+      <h2 class="panel__title">
+        <span class="panel__icon">🎯</span> Confidence
+      </h2>
+      <div class="confidence-meter" id="confidenceMeter">
+        <div class="confidence-meter__ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="confidence-meter__bg" cx="60" cy="60" r="52" />
+            <circle class="confidence-meter__fill" cx="60" cy="60" r="52" id="confRing" stroke-dasharray="327"
+              stroke-dashoffset="327" />
+          </svg>
+          <span class="confidence-meter__value" id="confValue">—</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>Pluto v1.0 Pipeline • Deterministic Routing • Real Model Switching • Evidence Verification</span>
+  </footer>
+
+  <script src="/static/app.js?v=2"></script>
+</body>
+
+</html>

@@ -1,0 +1,998 @@
+{
+  "final_answer": {
+    "response": "The proposed method uses a shallow-feature fusion module in the segmentation head.",
+    "sections": [
+      {
+        "title": "Overview",
+        "content": "• This paper proposes a method for real-time semantic segmentation of drones that integrates multi-scale global context information.\n• The method utilizes a UNet structure with a Resnet18 network as the encoder and incorporates a global–local attention module."
+      },
+      {
+        "title": "Method",
+        "content": "• The method uses a shallow-feature fusion module in the segmentation head.\n• The model was tested on the UAvid and UDD6 datasets."
+      },
+      {
+        "title": "Results",
+        "content": "• The method achieved an accuracy of 68% mIoU on the UAvid dataset.\n• The method achieved an accuracy of 67% mIoU on the UDD6 dataset.\n• The method achieved a real-time performance of 72.4 frames/s."
+      },
+      {
+        "title": "Limitations",
+        "content": "• The method may not be suitable for all types of drone imagery.\n• The method may require additional training data for optimal performance."
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C8",
+      "where": "chunk C8",
+      "supports": "CNN convolutions can only utilize local information to understand images.",
+      "quote": "CNN convolutions can only utilize local information to understand images."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C8",
+      "where": "chunk C8",
+      "supports": "The channel attention mechanism was first proposed in SENet.",
+      "quote": "Hu et al. first proposed the channel attention mechanism in SENet,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C8",
+      "where": "chunk C8",
+      "supports": "Performing 2D global pooling leads to the loss of positional information.",
+      "quote": "Although the above models combine channel and spatial attention mechanisms, per- forming 2D global pooling leads to the loss of positional information,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C8",
+      "where": "chunk C8",
+      "supports": "The ResNet18 model is used as the encoder in this model.",
+      "quote": "This model is constructed based on the UNet structure, with the ResNet18 model used as the encoder"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C8",
+      "where": "chunk C8",
+      "supports": "The global local attention mechanism integrates corresponding feature information from the encoder to extract semantic information about the features.",
+      "quote": "The global–local attention mechanism integrates corresponding feature information from the encoder to extract semantic information about the features."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C8",
+      "where": "chunk C8",
+      "supports": "The shallow-feature fusion module combines features from different scales of the encoder to enhance the spatial information of shallow features.",
+      "quote": "The decoder comprises three global–local attention mechanisms and a shallow-feature fusion module: skip the connection and use the most straightforward connection operation."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C21",
+      "where": "chunk C21",
+      "supports": "The proposed model's architecture consists of a baseline model with additional modules, including GLAM and SLFM.",
+      "quote": "baseline model"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C21",
+      "where": "chunk C21",
+      "supports": "The baseline model refers to Unet.",
+      "quote": "where the baseline refers to Unet"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C21",
+      "where": "chunk C21",
+      "supports": "The addition of GLAM and SLFM modules to the baseline model improves segmentation accuracy.",
+      "quote": "adding individual and combined modules resulted in 9% and 10% improvements"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C21",
+      "where": "chunk C21",
+      "supports": "The proposed model enhances the detection of small objects and details.",
+      "quote": "The results show that the proposed model enhances the detection of small objects and details"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Multi-scale methods are applied at the end of the decoder to fuse the features extracted by the encoder at different stages.",
+      "quote": "multi-scale methods are applied at the end of the decoder"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "The fused features are added to the features of the global–local attention block, and the segmentation results are obtained through 1 ×1 convolution and upsampling.",
+      "quote": "1 ×1 convolution and upsampling"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Deep learning networks for real-time semantic segmentation tasks have mainly been categorized into single-branch, dual-branch, and U-shaped networks.",
+      "quote": "single-branch, dual-branch, and U-shaped networks"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Single-branch networks focus primarily on the encoder, simplifying the decoder layers.",
+      "quote": "simplifying the decoder layers"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Liu et al. proposed a feature pyramid encoding block that encodes multi-scale contextual features using deep dilated convolutions at all encoder stages.",
+      "quote": "feature pyramid encoding block"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "The Cityscapes and CamVid datasets were tested at a resolution of 1024×512, achieving a real-time performance of 102 frames per second (fps) with accuracies of 68% mIoU and 65.4% mIoU, respectively.",
+      "quote": "102 frames per second"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Dual-branch networks use one branch to extract spatial information and another to model semantic contextual information.",
+      "quote": "one branch to extract spatial information"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Yu et al. proposed the bilateral segmentation network, BiSeNet, which extracts shallow spatial information and deep, rich semantic information.",
+      "quote": "bilateral segmentation network"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "The Cityscapes dataset was tested at a resolution of 2048 ×1024, achieving a real-time performance of 65.5 fps with an accuracy of 74.7% mIoU.",
+      "quote": "65.5 fps"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Fan et al. proposed a short-term dense cascade network, SDCN, which adjusts the depth and number of convolution kernels to capture receptive fields of different features.",
+      "quote": "short-term dense cascade network"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "The Cityscapes dataset was tested at a resolution of 512×1024, achieving a real-time performance of 250.4 fps with an accuracy of 71.9% mIoU.",
+      "quote": "250.4 fps"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "U-shaped networks adopt an encoder–decoder structure, allowing them to sample and fuse features across different scales, extracting rich spatial and contextual information.",
+      "quote": "encoder–decoder structure"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Zhang et al. introduced a scale-aware semantic extractor that extracts semantic information at different scales, capturing the entire image’s receptive fields and semantic information.",
+      "quote": "scale-aware semantic extractor"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "The ADE20K dataset was tested at a resolution of 512 ×512, achieving a real-time performance of 13 fps with an accuracy of 36.1% mIoU.",
+      "quote": "13 fps"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "Wang et al. improved model precision and accuracy by using a lightweight pre-trained model, ResNet18, as the encoder and proposed a global–local transformer block in the decoder.",
+      "quote": "global–local transformer block"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C6",
+      "where": "chunk C6",
+      "supports": "The UAVid and LoveDA datasets were tested with a 3090 GPU at a resolution of 1024 ×1024, achieving a real-time performance of 115.6 fps with accuracies of 67.8% mIoU and 52.4% mIoU, respectively.",
+      "quote": "115.6 fps"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The UAVid dataset is a high-resolution dataset.",
+      "quote": "The UAVid dataset is a high-resolution dataset (3840 × 2160 and 4096 × 2160) captured by drones,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The UAVid dataset contains 42 sequences.",
+      "quote": "The UAVid dataset contains 42 sequences."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "Each sequence includes ten images.",
+      "quote": "Each sequence includes ten images, resulting in a total of 420 images."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The UAVid dataset includes eight types of ground objects.",
+      "quote": "The UAVid dataset includes eight types of ground objects: buildings, roads, static vehicles, trees, low vegetation, people, moving vehicles, and cluttered backgrounds."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The UAVid dataset is divided into 20 training sequences, 7 validation sequences, and 15 test sequences.",
+      "quote": "The dataset is divided into 20 training sequences, 7 validation sequences, and 15 test sequences;"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The training set has 270 images.",
+      "quote": "The training set has 270 images, and the validation set has 150 images,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The validation set has 150 images.",
+      "quote": "The training set has 270 images, and the validation set has 150 images,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The model is trained on two datasets of UAV remote sensing imagery, UAVid, UDD6, and LoveDA.",
+      "quote": "In this paper, the model is trained on two datasets of UAV remote sensing imagery, UAVid [19], UDD6 [20], and LoveDA [21]."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The model's accuracy and inference speed are tested and compared with several state-of-the-art models.",
+      "quote": "The model’s accuracy and inference speed are tested and compared with several state-of-the-art models proposed in recent years."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "UDD6 is a dataset for the understanding and reconstruction of aerial scenes.",
+      "quote": "UDD6 is a dataset for the understanding and reconstruction of aerial scenes collected and labeled by the Graphics and Interaction Laboratory of Peking University using DJI Phantom 4 drones at a height"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C15",
+      "where": "chunk C15",
+      "supports": "The resolution of the UDD6 data is 4k (4096 ×2160) or 12M (4000 ×3000).",
+      "quote": "The resolution of the data is 4 k (4096 ×2160) or 12 M (4000 ×3000) and includes a variety of urban scenes."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The dataset is divided into 85 training images, 35 verification images and 20 test images.",
+      "quote": "The dataset is divided into 85 training images, 35 verification images and 20 test images,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The training images and test images are independent of each other.",
+      "quote": "The training images and test images are independent of each other."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The dataset is divided into facades, roads, vegetation, cars, roofs, and others.",
+      "quote": "The dataset is divided into facades, roads, vegetation, cars, roofs, and others."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The LoveDa dataset constructs an urban–rural domain adaptive land-cover dataset.",
+      "quote": "The LoveDa dataset constructs an urban–rural domain adaptive land-cover dataset."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The LoveDa dataset includes 5987 high-resolution images of 0.3 m from three different cities, Nanjing, Changzhou, and Wuhan.",
+      "quote": "The LoveDa dataset includes 5987 high-resolution images of 0.3 m from three different cities, Nanjing, Changzhou, and Wuhan."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "Each image has a resolution of 1024 ×1024 and includes seven categories: background, buildings, roads, water bodies, bare soil, forest land, and cultivated land.",
+      "quote": "Each image has a resolution of 1024 ×1024 and includes seven categories: background, buildings, roads, water bodies, bare soil, forest land, and cultivated land."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The training set consists of 2521 images, the validation set consists of 1670 images, and the test set consists of 1796 images.",
+      "quote": "The training set consists of 2521 images, the validation set consists of 1670 images, and the test set consists of 1796 images."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The experiments were conducted using the PyTorch 2.1.0 deep learning framework and the CUDA 11.8 library, with Python version 3.8, on a Windows 11 operating system.",
+      "quote": "The experiments were conducted using the PyTorch 2.1.0 deep learning framework and the CUDA 11.8 library, with Python version 3.8, on a Windows 11 operating system."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "Model training and testing were performed on an Intel Xeon Gold 6348 CPU and an NVIDIA GeForce RTX 3090 24 GB GPU with 256 GB of RAM.",
+      "quote": "Model training and testing were performed on an Intel Xeon Gold 6348 CPU and an NVIDIA GeForce RTX 3090 24 GB GPU with 256 GB of RAM."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The evaluation metrics include the mean Intersection over Union (mIoU) to measure the prediction accuracy of the algorithm.",
+      "quote": "The evaluation metrics include the mean Intersection over Union (mIoU) to measure the prediction accuracy of the algorithm."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The mIoU is calculated as the average ratio of the intersection and union between the ground truth and the predicted values for all classes.",
+      "quote": "The mIoU is calculated as the average ratio of the intersection and union between the ground truth and the predicted values for all classes."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The formula for mIoU is mIoU = ∑[i=0 to m] (pii) / (∑[j=0 to m] pij + ∑[j=0 to m] pji - pii).",
+      "quote": "mIoU = ∑[i=0 to m] (pii) / (∑[j=0 to m] pij + ∑[j=0 to m] pji - pii)"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "FPS is calculated as the ratio of the number of frames N to the time required to process them.",
+      "quote": "FPS is calculated as the ratio of the number of frames N to the time required to process them."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The formula for FPS is FPS = N / ∑[i=1 to N] Ti.",
+      "quote": "FPS = N / ∑[i=1 to N] Ti"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "F1 is a statistical indicator used to measure the accuracy of binary classification models.",
+      "quote": "F1 is a statistical indicator used to measure the accuracy of binary classification models."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "The range of F1 values is from 0 to 1, with higher values indicating better performance of the model.",
+      "quote": "The range of F1 values is from 0 to 1, with higher values indicating better performance of the model."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C17",
+      "where": "chunk C17",
+      "supports": "F1 is calculated as F1 = 2 * TP / (TP + FP + TN + FN).",
+      "quote": "F1 = 2 * TP / (TP + FP + TN + FN)"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article was received on 9 February 2025.",
+      "quote": "Received: 9 February 2025"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article was revised on 2 March 2025.",
+      "quote": "Revised: 2 March 2025"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article was accepted on 12 March 2025.",
+      "quote": "Accepted: 12 March 2025"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article was published on 13 March 2025.",
+      "quote": "Published: 13 March 2025"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article is an open access article distributed under the Creative Commons Attribution (CC BY) license.",
+      "quote": "This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY) license"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article was published in Sensors 2025, 25, 1786.",
+      "quote": "Sensors 2025 ,25, 1786"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's DOI is 10.3390/s25061786.",
+      "quote": "https://doi.org/10.3390/s25061786"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's authors are Zikang Zhang and Gongquan Li.",
+      "quote": "Zikang Zhang and Gongquan Li *"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's corresponding author is Gongquan Li.",
+      "quote": "*Correspondence: chuck123@yangtzeu.edu.cn"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's abstract states that current lightweight algorithms suffer from the lack of integration of global and local information in the image.",
+      "quote": "In real-time semantic segmentation for drone imagery, current lightweight al-gorithms suffer from the lack of integration of global and local information in the image,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article proposes a method for real-time semantic segmentation of drones that integrates multi-scale global context information.",
+      "quote": "This paper proposes a method for the real-time semantic segmentation of drones that integrates multi-scale global context information."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method utilizes a UNet structure with a Resnet18 network as the encoder.",
+      "quote": "The principle utilizes a UNet structure, with the encoder employing a Resnet18 network to extract features."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method incorporates a global–local attention module.",
+      "quote": "The decoder incorporates a global–local attention module,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method uses a shallow-feature fusion module in the segmentation head.",
+      "quote": "In the segmentation head, a shallow-feature fusion module is used to multi-scale integrate the various features extracted by the encoder,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method was tested on the UAvid and UDD6 datasets.",
+      "quote": "The model was tested on the UAvid and UDD6 datasets,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method achieved an accuracy of 68% mIoU on the UAvid dataset.",
+      "quote": "achieving accuracies of 68% mIoU (mean Intersection over Union) and"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method achieved an accuracy of 67% mIoU on the UDD6 dataset.",
+      "quote": "achieving accuracies of 68% mIoU (mean Intersection over Union) and 67% mIoU on the two datasets, respectively,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method achieved a 10% higher accuracy than the baseline model UNet on the UAvid dataset.",
+      "quote": "10% and 21.2% higher than the baseline model UNet."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method achieved a 21.2% higher accuracy than the baseline model UNet on the UDD6 dataset.",
+      "quote": "10% and 21.2% higher than the baseline model UNet."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method achieved a real-time performance of 72.4 frames/s.",
+      "quote": "The real-time performance of the model reached 72.4 frames/s,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C2",
+      "where": "chunk C2",
+      "supports": "The article's method achieved a 54.4 frames/s higher real-time performance than the baseline model UNet.",
+      "quote": "which is 54.4 frames/s higher than the baseline model UNet."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "Semantic segmentation is a novel and challenging task in various image processing tasks for drone remote sensing.",
+      "quote": "Semantic segmentation is a novel and challenging task in various image processing tasks for drone remote sensing."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "Semantic segmentation aims to classify every pixel in an image based on its semantic information.",
+      "quote": "Semantic segmentation aims to classify every pixel in an image based on its semantic information."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "The introduction and continuous improvement of convolutional neural networks (CNNs) have achieved remarkable results in semantic segmentation tasks.",
+      "quote": "The introduction and continuous improvement of convolutional neural networks (CNNs) have achieved remarkable results in semantic segmentation tasks."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "Current drone image analysis systems rely on images captured by drones and then uploaded to a computer platform for analysis.",
+      "quote": "Current drone image analysis systems rely on images captured by drones and then uploaded to a computer platform for analysis."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "A lightweight semantic segmentation model is needed to segment UAV images in real-time for analysis.",
+      "quote": "A lightweight semantic segmentation model is needed to segment UAV images in real-time for analysis."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "Pre-trained models are usually trained on massive amounts of data, which improves the efficiency and stability of training.",
+      "quote": "Pre-trained models are usually trained on massive amounts of data, which improves the efficiency and stability of training."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "Adopting a large pre-trained model not only improves accuracy but also brings high computational complexity.",
+      "quote": "Adopting a large pre-trained model not only improves accuracy but also brings high computational complexity."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "This paper uses a lightweight pre-trained ResNet18 model as the encoder in the UNet model for feature extraction.",
+      "quote": "This paper uses a lightweight pre-trained ResNet18 model as the encoder in the UNet model for feature extraction."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C4",
+      "where": "chunk C4",
+      "supports": "This article designs a lightweight global–local attention block for decoders that require lightweight operations.",
+      "quote": "This article designs a lightweight global–local attention block for decoders that require lightweight operations."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The AdamW optimizer was used to train the models with a base learning rate of 0.0006.",
+      "quote": "AdamW optimizer was used to train the models, with the base learning rate set to 0.0006"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "A cosine annealing strategy was applied to adjust the learning rate.",
+      "quote": "A cosine annealing strategy was applied to adjust the learning rate"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The batch size was set to 8 and the number of epochs to 40.",
+      "quote": "The batch size was set to 8, and the number of epochs to 40"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The cross-entropy loss function was used as the loss function during training.",
+      "quote": "The cross-entropy loss function was used as the loss function during training"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "Images from both datasets were padded and cropped into eight patches of 1024 ×1024 pixels.",
+      "quote": "images from both datasets were padded and cropped into eight patches of 1024 ×1024 pixels"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "Data augmentation techniques, such as random vertical and horizontal flips and random brightness adjustments, were applied to the input images.",
+      "quote": "Data augmentation techniques, such as random vertical and horizontal flips and random brightness adjustments, were applied to the input images"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The baseline model used was Unet.",
+      "quote": "The baseline model used was Unet"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The mIoU, F1, and OA metrics were used to test the effect of the modules on network performance.",
+      "quote": "the mIoU, F1, and OA metrics were used to test the effect of the modules on network performance"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "Adding the GLAM module to the baseline model improved the recognition of various types, especially in the Façade class, Road class, Vegetation class, and Roof class.",
+      "quote": "Adding the GLAM module to the baseline model has significantly improved the recognition of various types, especially in the Façade class, Road class, Vegetation class, and Roof class"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The improvement in the Façade class, Road class, Vegetation class, and Roof class was 18%, 13.6%, 30.5%, and 27.9%, respectively.",
+      "quote": "with an increase of 18%, 13.6%, 30.5%, and 27.9%, respectively"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "When both the GLAM and SLFM modules are added to the baseline model, the segmentation performance is better in the Road class, Vegetable class, and Other class.",
+      "quote": "When both the GLAM and SLFM modules are added to the baseline model, compared to a single GLAM module, the segmentation performance is better in the Road class, Vegetable class, and Other class"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The improvements in the Road class, Vegetable class, and Other class were 4.5%, 1.3%, and 1.2%, respectively.",
+      "quote": "with improvements of 4.5%, 1.3%, and 1.2%, respectively"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The mIoU of the model reached 67% after integrating all proposed modules, an improvement of 21.2% compared to the baseline model.",
+      "quote": "the mIoU of this model reached 67%, an improvement of 21.2% compared to the baseline model"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C19",
+      "where": "chunk C19",
+      "supports": "The mIoU increased by 1.4%, the F1 score increased by 0.7%, and the OA increased by 0.4%.",
+      "quote": "with a 1.4% increase in mIoU, a 0.7% increase in the F1 score, and a 0.4% increase in OA"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C28",
+      "where": "chunk C28",
+      "supports": "The LoveDa dataset was selected to verify the universality of the model in this article.",
+      "quote": "In order to verify the universality of the model in this article, the LoveDa dataset was selected,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C28",
+      "where": "chunk C28",
+      "supports": "The GLAM module proposed in this article has significantly improved in various categories on the baseline model.",
+      "quote": "The GLAM module proposed in this article has significantly improved in various categories on the baseline model, with improvements of 8.4%, 17.8%, and 9.6% in the road, bare soil, and cultivated land "
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C28",
+      "where": "chunk C28",
+      "supports": "The model in this article showed good improvement in recognition rates for various types after adding the SLFM module.",
+      "quote": "After adding the SLFM module, the model in this article showed good improvement in recognition rates for various types, with improvements of 2.8%, 1.9%, and 2.9% in the background, building, and bare "
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C28",
+      "where": "chunk C28",
+      "supports": "The model proposed in this paper performs better in edge segmentation compared to the baseline model.",
+      "quote": "As shown in Figure 9, the model proposed in this paper performs better in edge segmentation compared to the baseline model,"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C28",
+      "where": "chunk C28",
+      "supports": "The LoveDA dataset includes urban and rural scenarios to validate the universality of this article.",
+      "quote": "The LoveDa dataset was selected, which includes urban and rural scenarios to validate the universality of this article."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C28",
+      "where": "chunk C28",
+      "supports": "The model in this article showed a 2% increase in mIoU after adding the SLFM module.",
+      "quote": "It also showed a 2% increase in mIoU, a 1.5% increase in the F1 value, and a 1.5% increase in the OA value."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C28",
+      "where": "chunk C28",
+      "supports": "The model proposed in this paper performs better in edge segmentation between adjacent different objects.",
+      "quote": "and performs better in edge segmentation between adjacent different objects."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C31",
+      "where": "chunk C31",
+      "supports": "The model proposed in this paper has significantly improved the object edge segmentation effect.",
+      "quote": "The model proposed in this paper has significantly improved the object edge segmentation effect, especially in the black wireframe where effective segmentation was performed on the edge parts containe"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C31",
+      "where": "chunk C31",
+      "supports": "The model proposed in this article performs well in segmenting rural scenes.",
+      "quote": "In Figure 10b, the model proposed in this article performs well in segmenting rural scenes."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C31",
+      "where": "chunk C31",
+      "supports": "The segmentation effect of bare soil and forest edges is closer to the real segmentation.",
+      "quote": "For example, in the black wireframe, the segmentation effect of bare soil and forest edges is closer to the real segmentation."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C31",
+      "where": "chunk C31",
+      "supports": "This article compares the visualization results of each model, as shown in the figure.",
+      "quote": "This article compares the visualization results of each model, as shown in the figure."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C34",
+      "where": "chunk C34",
+      "supports": "The proposed model primarily comprises an encoder, a global–local attention module, and a shallow-feature fusion module.",
+      "quote": "a real-time semantic segmentation algorithm"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C34",
+      "where": "chunk C34",
+      "supports": "The global–local attention module adopts a dual-branch structure.",
+      "quote": "dual-branch structure"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C34",
+      "where": "chunk C34",
+      "supports": "The shallow-feature fusion module utilizes features from the U-Net’s down-sampling layers.",
+      "quote": "shallow-feature fusion module"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C34",
+      "where": "chunk C34",
+      "supports": "The proposed model achieves a real-time performance of 72.4 FPS with an input resolution of 1024 ×1024 on the UAVid test set.",
+      "quote": "72.4 FPS"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C34",
+      "where": "chunk C34",
+      "supports": "The model has an accuracy of 68% mIoU on the UAVid test set.",
+      "quote": "68% mIoU"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C9",
+      "where": "chunk C9",
+      "supports": "The module combines features from different scales of the encoder.",
+      "quote": "module combines features"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C9",
+      "where": "chunk C9",
+      "supports": "The purpose of the module is to enhance the spatial information of shallow features.",
+      "quote": "enhance the spatial in-"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C3",
+      "where": "chunk C3",
+      "supports": "Many semantic segmentation methods try to increase the network depth and the number of channels of the model to capture richer semantic and spatial information.",
+      "quote": "increase the network depth and the number of channels"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C3",
+      "where": "chunk C3",
+      "supports": "Increasing the depth and number of channels in a model increases the number of parameters in the network.",
+      "quote": "increases the number of parameters"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C3",
+      "where": "chunk C3",
+      "supports": "Increasing the number of parameters in a network requires more computing power from the hardware.",
+      "quote": "requiring more computing power"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C3",
+      "where": "chunk C3",
+      "supports": "Increasing the depth and number of channels in a model increases the inference time of the model.",
+      "quote": "increases the inference time"
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C10",
+      "where": "chunk C10",
+      "supports": "The proposed model has a global–local attention module.",
+      "quote": "In the global–local attention module, both a global branch and a local branch were designed to improve the model’s ability to extract and fuse contextual information from feature maps."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C10",
+      "where": "chunk C10",
+      "supports": "The global branch applies pooling operations along the x-axis and y-axis.",
+      "quote": "In the global branch, pooling operations are applied along the x-axis and y-axis, compressing the information in these directions and embedding it into the feature map."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C10",
+      "where": "chunk C10",
+      "supports": "The local branch applies convolution operations with kernel sizes of 1 × 1 and 3 × 3.",
+      "quote": "Therefore, an additional local branch is designed, utilizing convolution operations with kernel sizes of 1 × 1 and 3 × 3 to capture the relevant information between neighboring pixels."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C10",
+      "where": "chunk C10",
+      "supports": "The global and local branches are fused to enable interaction between global and local information.",
+      "quote": "The global and local branches are then fused, enabling interaction between global and local information, which enhances the algorithm’s accuracy."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C10",
+      "where": "chunk C10",
+      "supports": "The global attention branch utilizes coordinate attention to extract global information.",
+      "quote": "The global attention branch utilizes coordinate attention to extract global information, considering both inter-channel relationships and positional information."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C10",
+      "where": "chunk C10",
+      "supports": "The local branch applies two convolutions with kernel sizes of 3 and 1.",
+      "quote": "The local branch applies two convolutions with kernel sizes of 3 and 1 to capture local information from the feature map."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "The global–local attention module network structure is called GLAM.",
+      "quote": "Figure 3. Global–local attention module network structure (GLAM)."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "The global attention branch utilizes coordinate attention to extract global information.",
+      "quote": "The global attention branch utilizes coordinate attention to extract global information, considering both inter-channel relationships and positional information."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "The local branch applies two convolutions with kernel sizes of 3 and 1.",
+      "quote": "The local branch applies two convolutions with kernel sizes of 3 and 1 to capture local information from the feature map."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "The global and local branches are fused, enabling interaction between global and local information.",
+      "quote": "The global and local branches are then fused, enabling interaction between global and local information, which enhances the algorithm’s accuracy."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "The article inputs the feature maps of four ResNet blocks into the corresponding global–local attention modules through skip connections.",
+      "quote": "Firstly, this article inputs the feature maps of four ResNet blocks into the corresponding global–local attention modules through skip connections."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "The output of the deep global–local attention modules will be fused with the skip-connected feature maps as the feature input of the upper-level attention modules.",
+      "quote": "The output of the deep global–local attention modules will be fused with the skip-connected feature maps as the feature input of the upper-level attention modules."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "Average pooling is performed along the horizontal and vertical directions.",
+      "quote": "In the global branch, average pooling is performed along the horizontal and vertical directions, resulting in two 1D vectors (H ×1 and 1 ×W)."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "Average pooling results in two 1D vectors (H ×1 and 1 ×W).",
+      "quote": "In the global branch, average pooling is performed along the horizontal and vertical directions, resulting in two 1D vectors (H ×1 and 1 ×W)."
+    },
+    {
+      "doc_id": "sensors-25-01786",
+      "chunk_id": "C11",
+      "where": "chunk C11",
+      "supports": "The formula for average pooling is Xavg = XAvgPool(Input).",
+      "quote": "Xavg=XAvgPool (Input ) (1)"
+    }
+  ],
+  "trace_summary": {
+    "real_switching": true,
+    "modes_used_counts": {
+      "MODE_REASONING": 1,
+      "MODE_QUICK": 1
+    },
+    "models_used": [
+      "llama-3.1-8b-instant"
+    ],
+    "docs_opened": [
+      "sensors-25-01786"
+    ],
+    "chunks_processed": 15,
+    "search_queries": [
+      "give the detailes about the whole paper"
+    ],
+    "budget_notes": "Within limits"
+  },
+  "confidence": 0.2,
+  "missing_info": [
+    "Information about the suitability of the proposed method for different types of drone imagery is missing.",
+    "Information about the optimal performance of the proposed method is unclear."
+  ],
+  "next_actions": [
+    "Investigate the accuracy of the proposed method on the UAvid dataset.",
+    "Investigate the accuracy of the proposed method on the UDD6 dataset.",
+    "Investigate the real-time performance of the proposed method."
+  ]
+}

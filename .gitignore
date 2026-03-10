@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+debug.txt
+output_log.txt
+verify_dump.txt
+mp1/debug.txt
+mp1/output_log.txt
+mp1/verify_dump.txt
