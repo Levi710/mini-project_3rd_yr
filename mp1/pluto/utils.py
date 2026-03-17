@@ -1,5 +1,5 @@
 """
-antigravity/utils.py — Shared utilities for response parsing.
+pluto/utils.py — Shared utilities for response parsing.
 """
 
 from __future__ import annotations

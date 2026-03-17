@@ -1,5 +1,5 @@
 """
-antigravity/ingest.py — File ingestion: convert uploaded files to corpus Markdown.
+pluto/ingest.py — File ingestion: convert uploaded files to corpus Markdown.
 
 Supports: .pdf, .docx, .doc, .txt, .md
 
@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from antigravity.doc_index import DocIndex
+    from pluto.doc_index import DocIndex
 
 
 def ingest_file(
@@ -65,7 +65,7 @@ def ingest_file(
     chunk_meta_list = _classify_and_tag_chunks(chunks)
 
     if doc_index is not None:
-        from antigravity.doc_index import ChunkMeta
+        from pluto.doc_index import ChunkMeta
         meta_objects = [
             ChunkMeta(
                 chunk_id=m["chunk_id"],
@@ -181,8 +181,8 @@ def _split_into_chunks(content: str, max_chunk: int = 1500) -> list[str]:
 
 def _classify_and_tag_chunks(chunks: list[str]) -> list[dict]:
     """Classify each chunk and tag it with target model mode."""
-    from antigravity.chunker import classify_chunk
-    from antigravity.models import CHUNK_TYPE_TO_MODE
+    from pluto.chunker import classify_chunk
+    from pluto.models import CHUNK_TYPE_TO_MODE
 
     result = []
     for i, chunk_text in enumerate(chunks):

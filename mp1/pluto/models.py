@@ -1,5 +1,5 @@
 """
-antigravity/models.py — Pydantic schemas for all 4 pipeline stages + final output.
+pluto/models.py — Pydantic schemas for all 4 pipeline stages + final output.
 
 Every model matches the spec JSON schemas exactly (§6-§7).
 """

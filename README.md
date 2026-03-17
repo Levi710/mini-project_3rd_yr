@@ -1,5 +1,5 @@
 ---
-title: AntiGravity Pipeline
+title: Pluto Pipeline
 emoji: 🚀
 colorFrom: indigo
 colorTo: blue
@@ -8,7 +8,7 @@ app_port: 7860
 pinned: false
 ---
 
-# AntiGravity: Real Mode-Switching Extraction Pipeline
+# Pluto: Real Mode-Switching Extraction Pipeline
 
 This is an AI-powered document extraction pipeline that intelligently routes, understands, and verifies document data.
 

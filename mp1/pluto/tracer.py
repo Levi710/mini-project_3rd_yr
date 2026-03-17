@@ -1,5 +1,5 @@
 """
-antigravity/tracer.py — Logging & trace system for pipeline execution.
+pluto/tracer.py — Logging & trace system for pipeline execution.
 
 Maintains an in-memory log of all events and can export as JSON.
 """

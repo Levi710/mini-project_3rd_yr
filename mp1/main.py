@@ -1,5 +1,5 @@
 """
-main.py — CLI entry point for the AntiGravity pipeline.
+main.py — CLI entry point for the Pluto pipeline.
 
 Usage:
   python main.py --query "Your question" --corpus ./corpus
@@ -19,7 +19,7 @@ load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser(
-        description="AntiGravity — Real Mode-Switching Extraction Pipeline",
+        description="Pluto — Real Mode-Switching Extraction Pipeline",
     )
     parser.add_argument("--query", "-q", type=str, help="User query to process")
     parser.add_argument("--corpus", "-c", type=str, default="./corpus", help="Path to corpus directory")
@@ -45,10 +45,10 @@ def main():
 
 def _run_cli(query: str, corpus_dir: str, output_dir: str):
     """Run the pipeline from CLI and print structured output."""
-    from antigravity.pipeline import PipelineRunner
+    from pluto.pipeline import PipelineRunner
 
     print("=" * 60)
-    print("  AntiGravity Pipeline v1.0")
+    print("  Pluto Pipeline v1.0")
     print("=" * 60)
     print(f"  Query:  {query}")
     print(f"  Corpus: {corpus_dir}")
@@ -85,8 +85,8 @@ def _run_cli(query: str, corpus_dir: str, output_dir: str):
 def _start_server(port: int):
     """Start the FastAPI web dashboard."""
     import uvicorn
-    print(f"  Starting AntiGravity Dashboard on http://localhost:{port}")
-    uvicorn.run("antigravity.server:app", host="0.0.0.0", port=port, reload=False)
+    print(f"  Starting Pluto Dashboard on http://localhost:{port}")
+    uvicorn.run("pluto.server:app", host="0.0.0.0", port=port, reload=False)
 
 
 def _stage_num(stage: str) -> int:

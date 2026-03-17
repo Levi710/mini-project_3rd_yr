@@ -1,5 +1,5 @@
 """
-antigravity/doc_index.py — In-memory document index with disk persistence.
+pluto/doc_index.py — In-memory document index with disk persistence.
 
 Stores pre-processed document data so chunks are split once,
 classified once, and the LLM overview is computed once per document.

@@ -1,5 +1,5 @@
 """
-antigravity/chunker.py — Chunk classifier (spec §4).
+pluto/chunker.py — Chunk classifier (spec §4).
 
 Classifies each text chunk into one of:
   text | math | table | figure | code | references | noise
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import re
 
-from antigravity.models import ChunkType
+from pluto.models import ChunkType
 
 
 # ── Heuristic rules ───────────────────────────────────────────────────────────

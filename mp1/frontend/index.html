@@ -43,6 +43,10 @@
       <button id="runBtn" class="query-bar__btn" disabled style="opacity:0.5;cursor:not-allowed;">
         <span class="btn-icon">▶</span> Run Pipeline
       </button>
+      <button id="benchBtn" class="query-bar__btn query-bar__btn--bench" disabled
+        style="opacity:0.5;cursor:not-allowed;background:transparent;border:1px solid #7c3aed;color:#7c3aed;margin-left:8px;">
+        <span class="btn-icon">⚖️</span> Benchmark
+      </button>
     </div>
   </section>
 
@@ -108,6 +112,17 @@
       </h2>
       <div class="panel__body" id="answerBody">
         <p class="panel__placeholder">Run a query to see results…</p>
+      </div>
+    </section>
+
+    <!-- Benchmark Comparison Panel -->
+    <section class="panel panel--benchmark" id="benchPanel"
+      style="display:none; grid-column: 1 / -1; background: rgba(124, 58, 237, 0.05); border: 2px dashed #7c3aed; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+      <h2 class="panel__title">
+        <span class="panel__icon">⚖️</span> Pluto vs Single Model Baseline
+      </h2>
+      <div class="panel__body" id="benchBody" style="display:flex; justify-content: space-around; gap: 20px;">
+        <div id="benchLoader">Benchmarking…</div>
       </div>
     </section>
 

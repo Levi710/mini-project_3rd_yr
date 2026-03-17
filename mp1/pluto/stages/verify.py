@@ -1,5 +1,5 @@
 """
-antigravity/stages/verify.py — S3 VERIFY stage.
+pluto/stages/verify.py — S3 VERIFY stage.
 
 Cross-checks merged claims against source evidence.
 Unsupported claims are removed or downgraded.
@@ -10,8 +10,8 @@ from __future__ import annotations
 import json
 import re
 
-from antigravity.dispatcher import dispatch
-from antigravity.models import (
+from pluto.dispatcher import dispatch
+from pluto.models import (
     CheckedClaim,
     ClaimStatus,
     Evidence,
@@ -20,7 +20,7 @@ from antigravity.models import (
     Verification,
     VerifyOutput,
 )
-from antigravity.tracer import Tracer
+from pluto.tracer import Tracer
 
 
 _VERIFY_PROMPT = """You are an evidence verification engine. Check each claim below against the source evidence provided.
@@ -126,7 +126,7 @@ def run_verify(
 
 def _parse_verify(raw: str) -> VerifyOutput:
     """Parse the LLM verification response."""
-    from antigravity.utils import extract_json_from_response
+    from pluto.utils import extract_json_from_response
     json_str = extract_json_from_response(raw)
 
     try:

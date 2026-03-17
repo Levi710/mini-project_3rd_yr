@@ -18,11 +18,11 @@ COPY mp1 /app/mp1
 RUN mkdir -p /app/mp1/corpus /app/mp1/output && \
     chmod -R 777 /app/mp1/corpus /app/mp1/output
 
-# Set the working directory to where main.py and antigravity/ are
+# Set the working directory to where main.py and pluto/ are
 WORKDIR /app/mp1
 
 # Hugging Face Spaces expose port 7860 by default
 EXPOSE 7860
 
 # Command to run the FastAPI app
-CMD ["uvicorn", "antigravity.server:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "pluto.server:app", "--host", "0.0.0.0", "--port", "7860"]

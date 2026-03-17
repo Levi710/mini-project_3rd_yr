@@ -1,5 +1,5 @@
 """
-antigravity/stages/understand.py — Phase A: Document Understanding.
+pluto/stages/understand.py — Phase A: Document Understanding.
 
 Runs once per uploaded document (before any query).
 Like a student reading a book — builds a mental map of what's where,
@@ -18,11 +18,11 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
-from antigravity.dispatcher import dispatch
-from antigravity.tracer import Tracer
+from pluto.dispatcher import dispatch
+from pluto.tracer import Tracer
 
 if TYPE_CHECKING:
-    from antigravity.doc_index import DocIndex
+    from pluto.doc_index import DocIndex
 
 
 # ── Full-doc overview prompt (first pass) ────────────────────────────────
@@ -96,12 +96,12 @@ def run_understand(
     """
     Phase A — Understand: read the document like a student building comprehension.
 
-    Uses MULTI-PASS for large documents:
+    Uses PARALLEL MULTI-PASS for large documents:
       Pass 1: Read first batch, build initial overview + chunk tags
-      Pass 2+: Read remaining batches, tag remaining chunks
-
-    Returns the overview text.
+      Pass 2+: Read remaining batches in parallel, tag remaining chunks
     """
+    import concurrent.futures
+    
     tracer.log("stage_start", {"stage": "understand", "doc_id": doc_id})
 
     chunks = doc_index.get_chunks(doc_id)
@@ -109,8 +109,8 @@ def run_understand(
         tracer.log("understand_skip", {"reason": "no chunks", "doc_id": doc_id})
         return ""
 
-    # Split chunks into batches    # Send in batches (e.g., 8000 chars) to stay within model limits
-    batches = _split_into_batches(chunks, max_chars=8000)
+    # Split chunks into batches (max 4000 chars for Mistral stability)
+    batches = _split_into_batches(chunks, max_chars=4000)
 
     tracer.log("understand_batches", {
         "total_chunks": len(chunks),
@@ -118,35 +118,48 @@ def run_understand(
         "batch_sizes": [len(b) for b in batches],
     })
 
-    # ── Pass 1: Full overview from first batch ───────────────────────
+    # ── Pass 1: Full overview from first batch (Sequential) ──────────────────
+    # We do this first to establish context for subsequent batches
     first_batch_content = _format_batch(batches[0])
     prompt = _OVERVIEW_PROMPT.format(doc_content=first_batch_content)
 
+    print(f"  [PHASE A] Reading first batch of {doc_id} to build overview...")
     raw = dispatch("MODE_VISION", prompt, tracer=tracer)
     overview_text, chunk_topic_map = _parse_overview(raw)
 
-    # ── Pass 2+: Tag remaining chunks ────────────────────────────────
-    for batch_idx in range(1, len(batches)):
-        batch_content = _format_batch(batches[batch_idx])
-
+    # ── Pass 2+: Tag remaining chunks (Parallel) ──────────────────────
+    if len(batches) > 1:
+        print(f"  [PHASE A] Processing remaining {len(batches)-1} batches in parallel...")
+        
         # Compact version of existing understanding for context
         existing = overview_text[:1500] if len(overview_text) > 1500 else overview_text
 
-        cont_prompt = _CONTINUE_PROMPT.format(
-            existing_understanding=existing,
-            doc_content=batch_content,
-        )
+        def process_batch(idx):
+            batch_content = _format_batch(batches[idx])
+            cont_prompt = _CONTINUE_PROMPT.format(
+                existing_understanding=existing,
+                doc_content=batch_content,
+            )
+            try:
+                cont_raw = dispatch("MODE_VISION", cont_prompt, tracer=tracer)
+                return _parse_continuation(cont_raw)
+            except Exception as e:
+                print(f"  [WARNING] Batch {idx} failed: {e}")
+                return {}
 
-        cont_raw = dispatch("MODE_VISION", cont_prompt, tracer=tracer)
-        extra_topics = _parse_continuation(cont_raw)
-
-        # Merge new chunk topics into the map
-        chunk_topic_map.update(extra_topics)
-
-        tracer.log("understand_continue", {
-            "batch": batch_idx + 1,
-            "new_chunks_tagged": len(extra_topics),
-        })
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            future_to_batch = {executor.submit(process_batch, i): i for i in range(1, len(batches))}
+            for future in concurrent.futures.as_completed(future_to_batch):
+                batch_idx = future_to_batch[future]
+                try:
+                    extra_topics = future.result()
+                    chunk_topic_map.update(extra_topics)
+                    tracer.log("understand_continue", {
+                        "batch": batch_idx + 1,
+                        "new_chunks_tagged": len(extra_topics),
+                    })
+                except Exception as e:
+                    print(f"  [ERROR] Processing batch {batch_idx+1} result: {e}")
 
     # Store in doc index
     doc_index.set_overview(doc_id, overview_text)
@@ -201,7 +214,7 @@ def _parse_overview(raw: str) -> tuple[str, dict[str, list[str]]]:
         overview_text: readable understanding string
         chunk_topic_map: {chunk_id: [topic1, topic2, ...]} for smart routing
     """
-    from antigravity.utils import extract_json_from_response
+    from pluto.utils import extract_json_from_response
 
     json_str = extract_json_from_response(raw)
     chunk_topic_map: dict[str, list[str]] = {}
@@ -266,7 +279,7 @@ def _parse_overview(raw: str) -> tuple[str, dict[str, list[str]]]:
 
 def _parse_continuation(raw: str) -> dict[str, list[str]]:
     """Parse the continuation response — extract chunk_topics only."""
-    from antigravity.utils import extract_json_from_response
+    from pluto.utils import extract_json_from_response
 
     json_str = extract_json_from_response(raw)
     chunk_topic_map: dict[str, list[str]] = {}

@@ -1,5 +1,5 @@
 """
-antigravity/stages/extract.py — S1 EXTRACT stage.
+pluto/stages/extract.py — S1 EXTRACT stage.
 
 Iterates the chunk plan, dispatches each chunk to the correct mode/model,
 and produces structured ExtractOutput per chunk.
@@ -11,8 +11,8 @@ import json
 import re
 from typing import TYPE_CHECKING
 
-from antigravity.dispatcher import dispatch
-from antigravity.models import (
+from pluto.dispatcher import dispatch
+from pluto.models import (
     Claim,
     ChunkPlan,
     Evidence,
@@ -22,12 +22,12 @@ from antigravity.models import (
     SupportType,
     compute_chunk_hash,
 )
-from antigravity.tools import CorpusTools
-from antigravity.tracer import Tracer
-from antigravity.modes import get_mode
+from pluto.tools import CorpusTools
+from pluto.tracer import Tracer
+from pluto.modes import get_mode
 
 if TYPE_CHECKING:
-    from antigravity.extraction_cache import ExtractionCache
+    from pluto.extraction_cache import ExtractionCache
 
 
 # ── Extraction prompt ─────────────────────────────────────────────────────────
@@ -193,7 +193,7 @@ def run_extract(
 
 def _parse_extraction(raw: str, doc_id: str, chunk_id: str) -> ExtractedContent:
     """Parse the LLM JSON response into ExtractedContent."""
-    from antigravity.utils import extract_json_from_response
+    from pluto.utils import extract_json_from_response
     json_str = extract_json_from_response(raw)
 
     try:
@@ -224,7 +224,7 @@ def _parse_extraction(raw: str, doc_id: str, chunk_id: str) -> ExtractedContent:
 
     math_items = []
     for m in data.get("math", []):
-        from antigravity.models import MathItem
+        from pluto.models import MathItem
         math_items.append(MathItem(
             expression=m.get("expression", ""),
             interpretation=m.get("interpretation", ""),

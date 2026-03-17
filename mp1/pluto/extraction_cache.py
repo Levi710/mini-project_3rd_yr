@@ -1,5 +1,5 @@
 """
-antigravity/extraction_cache.py — Persistent cache for S1 EXTRACT results.
+pluto/extraction_cache.py — Persistent cache for S1 EXTRACT results.
 
 Stores LLM extraction outputs keyed by chunk content SHA-256 hash.
 On cache hit, the expensive LLM call is skipped entirely.

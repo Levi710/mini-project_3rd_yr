@@ -14,6 +14,9 @@
   const traceBody = document.getElementById('traceBody');
   const confRing = document.getElementById('confRing');
   const confValue = document.getElementById('confValue');
+  const benchBtn = document.getElementById('benchBtn'); // Added benchBtn
+  const benchPanel = document.getElementById('benchPanel');
+  const benchBody = document.getElementById('benchBody');
 
   const stages = ['route', 'extract', 'merge', 'verify'];
   const stageEls = {};
@@ -67,6 +70,32 @@
     }
   });
 
+  // ── Benchmark Comparison ────────────────────────────────────
+  benchBtn.addEventListener('click', async () => {
+    const query = queryInput.value.trim();
+    if (!query) return;
+
+    benchBtn.disabled = true;
+    benchBtn.innerHTML = '<span class="spinner"></span> Benchmarking…';
+    benchPanel.style.display = 'block';
+    benchBody.innerHTML = '<div id="benchLoader" style="width:100%; text-align:center; padding:20px;"><span class="spinner"></span> Running side-by-side comparison…</div>';
+
+    try {
+      const res = await fetch('/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      renderBenchmark(data);
+    } catch (err) {
+      benchBody.innerHTML = `<p style="color:var(--accent-red)">Error: ${err.message}</p>`;
+    } finally {
+      benchBtn.disabled = false;
+      benchBtn.innerHTML = '<span class="btn-icon">⚖️</span> Benchmark';
+    }
+  });
+
   // Enter key support
   queryInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && queryInput.value.trim()) runBtn.click();
@@ -78,6 +107,10 @@
     runBtn.disabled = !hasText;
     runBtn.style.opacity = hasText ? '1' : '0.5';
     runBtn.style.cursor = hasText ? '' : 'not-allowed';
+
+    benchBtn.disabled = !hasText;
+    benchBtn.style.opacity = hasText ? '1' : '0.5';
+    benchBtn.style.cursor = hasText ? '' : 'not-allowed';
   });
 
   // ── SSE stream ──────────────────────────────────────────────
@@ -267,6 +300,7 @@
       statusEls[s].textContent = 'idle';
     });
     connectors.forEach(c => c.classList.remove('active'));
+    benchPanel.style.display = 'none'; // Hide benchmark on fresh run
     answerBody.innerHTML = '<p class="panel__placeholder"><span class="spinner"></span> Processing…</p>';
     evidenceBody.innerHTML = '<p class="panel__placeholder">Waiting…</p>';
     traceBody.innerHTML = '<p class="panel__placeholder">Waiting…</p>';
@@ -533,6 +567,55 @@
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function renderBenchmark(data) {
+    const ag = data.pluto;
+    const bl = data.baseline;
+
+    const createCol = (title, stats, isWinner) => `
+      <div class="bench-col" style="flex:1; padding:20px; border-radius:12px; background:${isWinner ? 'rgba(124, 58, 237, 0.08)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isWinner ? '#7c3aed' : '#444'};">
+        <h3 style="margin-top:0; color:${isWinner ? '#c084fc' : '#aaa'}; display:flex; align-items:center; gap:8px;">
+          ${isWinner ? '🚀' : '🧊'} ${title}
+          ${isWinner ? '<span style="font-size:10px; background:#7c3aed; color:#fff; padding:2px 6px; border-radius:4px;">WINNER</span>' : ''}
+        </h3>
+        <div class="bench-stat" style="margin:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+          <span style="color:#888; font-size:12px;">LATENCY</span>
+          <div style="font-weight:600;">${stats.latency_s}s</div>
+        </div>
+        <div class="bench-stat" style="margin:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+          <span style="color:#888; font-size:12px;">REAL MODEL SWITCHING</span>
+          <div style="font-weight:600; color:${stats.real_switching ? '#4ade80' : '#f87171'}">${stats.real_switching ? '✓ Yes (8B+70B)' : '✗ No (single model)'}</div>
+        </div>
+        <div class="bench-stat" style="margin:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+          <span style="color:#888; font-size:12px;">VERIFIED CLAIMS</span>
+          <div style="font-weight:600; color:${stats.verified ? '#4ade80' : '#f87171'}">${stats.verified ? '✓ Enabled (S3)' : '✗ Disabled (Hallucination Risk)'}</div>
+        </div>
+        <div class="bench-stat" style="margin:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+          <span style="color:#888; font-size:12px;">EVIDENCE COUNT</span>
+          <div style="font-weight:600;">${stats.evidence_count} sources linked</div>
+        </div>
+        <div class="bench-stat" style="margin:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+          <span style="color:#888; font-size:12px;">CHUNKS SCANNED</span>
+          <div style="font-weight:600;">${stats.chunks_processed}</div>
+        </div>
+        <div class="bench-stat" style="margin:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+          <span style="color:#888; font-size:12px;">MODELS USED</span>
+          <div style="font-weight:600; font-size:12px;">${(stats.models_used || []).join(', ') || '—'}</div>
+        </div>
+        ${stats.answer_preview ? `
+        <div style="margin-top:12px;">
+          <span style="color:#888; font-size:12px;">ANSWER PREVIEW</span>
+          <div style="margin-top:6px; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px; font-size:13px; line-height:1.5; color:#ccc; max-height:150px; overflow-y:auto;">${esc(stats.answer_preview)}</div>
+        </div>` : ''}
+      </div>
+    `;
+
+    benchBody.innerHTML = `
+      ${createCol("Our Initiative (Pluto)", ag, true)}
+      <div style="display:flex; align-items:center; font-weight:bold; color:#555;">VS</div>
+      ${createCol("Single Model Baseline", bl, false)}
+    `;
   }
 
   // Load corpus on init

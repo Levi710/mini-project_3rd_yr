@@ -1,5 +1,5 @@
 """
-antigravity/pipeline.py — Orchestrator: Phase A (understand) + Phase B (query pipeline).
+pluto/pipeline.py — Orchestrator: Phase A (understand) + Phase B (query pipeline).
 
 Phase A: Document understanding — runs once per uploaded doc.
 Phase B: Query answering — chains S0→S1→S2→S3→finish per query.
@@ -11,7 +11,7 @@ import json
 import time
 from typing import Any
 
-from antigravity.models import (
+from pluto.models import (
     ClaimStatus,
     FinalAnswer,
     FinalEvidence,
@@ -19,14 +19,14 @@ from antigravity.models import (
     Section,
     TraceSummary,
 )
-from antigravity.modes import is_real_switching, MODE_REGISTRY
-from antigravity.stages.route import run_route
-from antigravity.stages.extract import run_extract
-from antigravity.stages.merge import run_merge
-from antigravity.stages.verify import run_verify
-from antigravity.tools import CorpusTools
-from antigravity.tracer import Tracer
-from antigravity.extraction_cache import ExtractionCache
+from pluto.modes import is_real_switching, MODE_REGISTRY
+from pluto.stages.route import run_route
+from pluto.stages.extract import run_extract
+from pluto.stages.merge import run_merge
+from pluto.stages.verify import run_verify
+from pluto.tools import CorpusTools
+from pluto.tracer import Tracer
+from pluto.extraction_cache import ExtractionCache
 
 
 class PipelineRunner:
@@ -126,7 +126,7 @@ class PipelineRunner:
         if not self.doc_index:
             return
 
-        from antigravity.stages.understand import run_understand
+        from pluto.stages.understand import run_understand
 
         for doc_info in self.doc_index.list_docs():
             if not doc_info["is_processed"]:
@@ -150,25 +150,25 @@ class PipelineRunner:
             content = "\n".join(f"• {p}" for p in sp.points) if sp.points else ""
             sections.append(Section(title=sp.section, content=content))
 
-        # Build response text from verified claims only
+        # Build response: sections are the primary answer structure
+        # Verified claims are appended as direct supporting evidence
+        section_parts = []
+        for s in sections:
+            if s.content:
+                section_parts.append(f"**{s.title}**\n{s.content}")
+        
         verified_claims = [
             cc for cc in verify_out.verification.checked_claims
             if cc.status == ClaimStatus.SUPPORTED
         ]
-        response_parts = [vc.claim for vc in verified_claims]
+        claim_parts = [vc.claim for vc in verified_claims]
 
-        if response_parts:
-            response = " ".join(response_parts)
-        elif sections:
-            # Fallback: if verify dropped all claims but merge has good sections,
-            # use section content as the response instead of "No verified claims found"
-            section_parts = []
-            for s in sections:
-                if s.content:
-                    section_parts.append(s.content)
-            response = " ".join(section_parts) if section_parts else "No verified claims found."
+        if section_parts:
+            response = "\n\n".join(section_parts)
+        elif claim_parts:
+            response = " ".join(claim_parts)
         else:
-            response = "No verified claims found."
+            response = "No answer could be generated from the provided documents."
 
         # Build evidence list
         evidence = []
@@ -193,8 +193,8 @@ class PipelineRunner:
         if total > 0:
             confidence = round(supported / total, 2)
         elif len(sections) > 0:
-            # S2 succeeded but S3 dropped claims — reasonable fallback
-            confidence = 0.85
+            # S3 returned nothing but S2 has structured content — moderate confidence
+            confidence = 0.6
         else:
             confidence = 0.0
 

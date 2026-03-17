@@ -1,5 +1,5 @@
 """
-antigravity/tools.py — Corpus access tools (spec §3).
+pluto/tools.py — Corpus access tools (spec §3).
 
 Implements list_docs, search, get_chunk, get_figure, get_table, log, finish
 over a local corpus/ directory.
@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from antigravity.tracer import Tracer
+from pluto.tracer import Tracer
 
 
 class CorpusTools:
@@ -80,7 +80,10 @@ class CorpusTools:
             self.tracer.log("get_chunk", {"doc_id": doc_id, "chunk_id": chunk_id})
 
         # chunk_id format: "C0", "C1", ...
-        idx = int(chunk_id.replace("C", ""))
+        try:
+            idx = int(chunk_id.lstrip("C"))
+        except ValueError:
+            return ""
         if 0 <= idx < len(chunks):
             return chunks[idx]
         return ""

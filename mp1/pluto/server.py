@@ -1,5 +1,5 @@
 """
-antigravity/server.py — FastAPI server bridging pipeline <-> web UI.
+pluto/server.py — FastAPI server bridging pipeline <-> web UI.
 
 Endpoints:
   POST /api/run      — start pipeline, return final JSON
@@ -23,9 +23,9 @@ from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from antigravity.pipeline import PipelineRunner
-from antigravity.extraction_cache import ExtractionCache
-from antigravity.doc_index import DocIndex
+from pluto.pipeline import PipelineRunner
+from pluto.extraction_cache import ExtractionCache
+from pluto.doc_index import DocIndex
 
 app = FastAPI(title="Pluto Pipeline", version="1.0.0")
 
@@ -49,10 +49,10 @@ _doc_index = DocIndex(persist_path=CORPUS_DIR / ".doc_index.json")
 async def startup_reindex():
     """On server start, index any corpus files not already in DocIndex."""
     import logging
-    from antigravity.ingest import ingest_file, _split_into_chunks, _classify_and_tag_chunks
-    from antigravity.doc_index import ChunkMeta
+    from pluto.ingest import ingest_file, _split_into_chunks, _classify_and_tag_chunks
+    from pluto.doc_index import ChunkMeta
 
-    logger = logging.getLogger("antigravity")
+    logger = logging.getLogger("pluto")
     CORPUS_DIR.mkdir(parents=True, exist_ok=True)
 
     for md_file in sorted(CORPUS_DIR.glob("*.md")):
@@ -143,12 +143,20 @@ async def run_pipeline(request: Request):
 
     except Exception as e:
         import traceback
+        err_msg = str(e)
         traceback.print_exc()
-        
-        # Log error to frontend stream
-        await _progress_queue.put({"stage": "error", "status": "failed", "detail": str(e)})
-            
-        return JSONResponse({"error": f"Pipeline crashed: {str(e)}"}, status_code=500)
+
+        # Always signal error to SSE stream
+        try:
+            await _progress_queue.put({"stage": "error", "status": "failed", "detail": err_msg})
+        except Exception:
+            pass
+
+        # ALWAYS return valid JSON — never let FastAPI return HTML 500
+        return JSONResponse(
+            {"error": f"Pipeline error: {err_msg}"},
+            status_code=200  # Return 200 so browser can parse the JSON body
+        )
 
 
 @app.get("/api/stream")
@@ -185,6 +193,23 @@ async def get_result():
     return JSONResponse({"error": "No result yet"}, status_code=404)
 
 
+@app.post("/api/compare")
+async def benchmark_compare(request: Request):
+    """Run benchmark: Pluto vs Single Model Baseline."""
+    from benchmark.compare import ComparisonRunner
+    
+    body = await request.json()
+    query = body.get("query", "")
+    
+    if not query:
+        return JSONResponse({"error": "No query provided"}, status_code=400)
+    
+    runner = ComparisonRunner(str(CORPUS_DIR), doc_index=_doc_index)
+    results = runner.compare(query)
+    
+    return JSONResponse(results)
+
+
 # ── File upload ───────────────────────────────────────────────────────────────
 
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".doc", ".txt", ".md", ".markdown"}
@@ -193,7 +218,7 @@ ALLOWED_EXTENSIONS = {".pdf", ".docx", ".doc", ".txt", ".md", ".markdown"}
 @app.post("/api/upload")
 async def upload_files(files: list[UploadFile] = File(...)):
     """Upload one or more files to the corpus."""
-    from antigravity.ingest import ingest_file
+    from pluto.ingest import ingest_file
 
     results = []
     errors = []
@@ -220,15 +245,18 @@ async def upload_files(files: list[UploadFile] = File(...)):
                 import threading
                 def _bg_understand(did):
                     try:
-                        from antigravity.stages.understand import run_understand
-                        from antigravity.tracer import Tracer
+                        from pluto.stages.understand import run_understand
+                        from pluto.tracer import Tracer
                         tracer = Tracer()
+                        print(f"  [SERVER] Starting background Phase A for {did}...")
                         run_understand(did, _doc_index, tracer)
-                    except Exception as e:
+                        print(f"  [SERVER] Background Phase A COMPLETE for {did}")
+                    except BaseException as e:
                         import traceback
-                        print(f"Background Phase A failed for {did}: {e}")
+                        print(f"  [CRITICAL] Background Phase A failed for {did}: {e}")
                         traceback.print_exc()
-                        pass  # Non-fatal: _ensure_docs_understood is the safety net
+                        # Ensure we don't leave the UI in a "loading" state if possible
+                        # (though DocIndex handles state, a crash might bypass set_overview)
                 threading.Thread(target=_bg_understand, args=(doc_id,), daemon=True).start()
                 info["understanding"] = "in_progress"
             else:

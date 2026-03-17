@@ -1,5 +1,5 @@
 """
-antigravity/stages/route.py — S0 ROUTE stage (Phase B).
+pluto/stages/route.py — S0 ROUTE stage (Phase B).
 
 Uses pre-indexed chunks from DocIndex. Scores each chunk by query relevance,
 selects the top N most relevant chunks, and builds a prioritized chunk plan.
@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import re
 
-from antigravity.chunker import classify_chunk
-from antigravity.models import (
+from pluto.chunker import classify_chunk
+from pluto.models import (
     Budgets,
     ChunkPlan,
     ChunkType,
@@ -20,12 +20,12 @@ from antigravity.models import (
     RouteOutput,
     CHUNK_TYPE_TO_MODE,
 )
-from antigravity.tools import CorpusTools
-from antigravity.tracer import Tracer
+from pluto.tools import CorpusTools
+from pluto.tracer import Tracer
 
 
 def run_route(query: str, tools: CorpusTools, tracer: Tracer) -> RouteOutput:
-    """S0 — Route: score chunks by query relevance, select top N, build plan."""
+    """S0 — Route: score ALL chunks across all docs, build full chunk plan."""
     tracer.log("stage_start", {"stage": "route", "query": query})
 
     # 1. List all available docs
@@ -40,30 +40,34 @@ def run_route(query: str, tools: CorpusTools, tracer: Tracer) -> RouteOutput:
 
     if search_results:
         for sr in search_results[:5]:
-            doc_scope.append(DocScope(
-                doc_id=sr["doc_id"],
-                reason=f"Matched query with score {sr['score']}",
-            ))
-            target_doc_ids.append(sr["doc_id"])
+            did = sr["doc_id"]
+            if did not in target_doc_ids:  # dedup
+                doc_scope.append(DocScope(
+                    doc_id=did,
+                    reason=f"Matched query with score {sr['score']}",
+                ))
+                target_doc_ids.append(did)
     else:
         for d in docs[:5]:
-            doc_scope.append(DocScope(
-                doc_id=d["doc_id"],
-                reason="No search hits — including for broad coverage",
-            ))
-            target_doc_ids.append(d["doc_id"])
+            did = d["doc_id"]
+            if did not in target_doc_ids:  # dedup
+                doc_scope.append(DocScope(
+                    doc_id=did,
+                    reason="No search hits — including for broad coverage",
+                ))
+                target_doc_ids.append(did)
 
-    # 4. Two-pass chunk selection with DYNAMIC budget
+    # Edge case: no docs in corpus at all
+    if not target_doc_ids:
+        tracer.log("route_empty", {"reason": "no documents in corpus"})
+        return RouteOutput(user_query=query, doc_scope=[], chunk_plan=[], budgets=Budgets())
+
+    # 4. Two-pass chunk selection — score ALL chunks, take ALL of them
     budgets = Budgets()
-    # Adjust extraction budget based on query complexity
-    budgets.max_extractions = _dynamic_budget(query)
     all_scored: list[dict] = []
 
     for doc_id in target_doc_ids:
-        # Get all chunks (from DocIndex cache or on-the-fly with cache)
         chunks = tools.get_all_chunks(doc_id)
-
-        # Get the chunk topic map from Phase A understanding (if available)
         chunk_topic_map: dict[str, list[str]] = {}
         if tools.doc_index:
             chunk_topic_map = tools.doc_index.get_chunk_topics(doc_id)
@@ -73,10 +77,7 @@ def run_route(query: str, tools: CorpusTools, tracer: Tracer) -> RouteOutput:
                 continue
 
             chunk_id = f"C{ci}"
-            # Get topic tags from Phase A understanding
             chunk_topics = chunk_topic_map.get(chunk_id, [])
-
-            # Score by query relevance (fast, no LLM call)
             score = _score_relevance(query, chunk_text, ci, chunk_topics)
 
             all_scored.append({
@@ -87,15 +88,18 @@ def run_route(query: str, tools: CorpusTools, tracer: Tracer) -> RouteOutput:
                 "relevance_score": score,
             })
 
-    # Sort by relevance score (highest first)
+    # Sort: highest relevance first so MERGE processes best content first
     all_scored.sort(key=lambda x: x["relevance_score"], reverse=True)
 
-    # Take top N most relevant chunks
-    top_chunks = all_scored[:budgets.max_extractions]
+    # Use ALL chunks — no arbitrary cap
+    # (merge uses batching so there is no context window issue)
+    total_chunks = len(all_scored)
+    budgets.max_extractions = total_chunks
+    top_chunks = all_scored  # every chunk included
 
     tracer.log("route_scoring", {
-        "total_chunks_scanned": len(all_scored),
-        "top_chunks_selected": len(top_chunks),
+        "total_chunks_scanned": total_chunks,
+        "top_chunks_selected": total_chunks,
         "top_scores": [round(c["relevance_score"], 3) for c in top_chunks[:5]],
     })
 
@@ -235,34 +239,4 @@ def _score_relevance(
     return score
 
 
-def _dynamic_budget(query: str) -> int:
-    """
-    Determine extraction budget based on query complexity.
 
-    Simple queries ("What year?") → 8 chunks
-    Medium queries ("What is the architecture?") → 15 chunks
-    Complex queries ("Compare methods and results across...") → 25 chunks
-    """
-    words = query.split()
-    word_count = len(words)
-
-    # Multi-part or comparative questions
-    complex_signals = ["compare", "versus", "difference", "relationship",
-                       "how does", "explain in detail", "all", "every",
-                       "comprehensive", "summarize the entire"]
-    if any(sig in query.lower() for sig in complex_signals):
-        return 25
-
-    # Simple factual lookups
-    simple_signals = ["what year", "who wrote", "when was", "what is the title",
-                      "how many pages", "what journal", "published in"]
-    if any(sig in query.lower() for sig in simple_signals):
-        return 8
-
-    # Default: scale with query length
-    if word_count <= 5:
-        return 10
-    elif word_count <= 12:
-        return 15
-    else:
-        return 25
